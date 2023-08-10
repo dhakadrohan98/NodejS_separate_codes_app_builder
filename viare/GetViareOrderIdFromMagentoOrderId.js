@@ -3,7 +3,7 @@ const axios = require('axios')
 
 var VIARE_ORDER_API= 'https://dusk.viare.io/global/api/Orders.asmx?WSDL'
 var VIARE_TOKEN = 'f5a31427-0329-4996-a8e4-90c0e3f78f6d';
-var magentoOrderId = 174;
+var magentoOrderId = 144;
 var ECOMMERCE_API_URL=https='//mcstaging.dusk.au/rest/default/V1/';
 var ECOMMERCE_ORDER_ENDPOINT='orders';
 var ECOMMERCE_AUTHORIZED_TOKEN='nq4zr49fhs07xv9584koqyjicyz3yybd';
@@ -141,7 +141,7 @@ async function getRelatedOrders(VIARE_ORDER_API, header, viareOrderId) {
 })
 }
 
-async function voidOrders(VIARE_TOKEN, header, viareOrderId, voidReasonCode) {
+async function voidOrders(VIARE_ORDER_API, header, viareOrderId, voidReasonCode) {
   var voidpayload = {
     'authenticationToken': VIARE_TOKEN,
     'orderID': viareOrderId,
@@ -174,7 +174,7 @@ async function test() {
   var relatedOrdersResponse = await getRelatedOrders(VIARE_ORDER_API, header, actualViareOrderId);
 
   var voidReasonCode = "nr";
-  var voidOrdersResponse = await voidOrders(VIARE_ORDER_API, header, 10585, voidReasonCode);
+  var voidOrdersResponse = await voidOrders(VIARE_ORDER_API, header, actualViareOrderId, voidReasonCode);
   console.log("Order Data: "+ JSON.stringify(orderData));
   console.log("\n");
   console.log("****************************");
