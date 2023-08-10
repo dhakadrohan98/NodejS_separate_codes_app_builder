@@ -3,6 +3,7 @@ const axios = require('axios')
 
 var VIARE_ORDER_API= 'https://dusk.viare.io/global/api/Orders.asmx?WSDL'
 var VIARE_TOKEN = 'f5a31427-0329-4996-a8e4-90c0e3f78f6d';
+var itemQuantity = 1;
 var magentoOrderId = 144;
 var ECOMMERCE_API_URL=https='//mcstaging.dusk.au/rest/default/V1/';
 var ECOMMERCE_ORDER_ENDPOINT='orders';
@@ -12,7 +13,7 @@ var ECOMMERCE_AUTHORIZED_TOKEN='nq4zr49fhs07xv9584koqyjicyz3yybd';
 const header = {
             'trace':1,
             'exceptions': true,
-            'connection_timeout': 15
+            'connection_timeout': 15,
 }
 
 // SendViare Authentication Request
@@ -164,6 +165,35 @@ async function voidOrders(VIARE_ORDER_API, header, viareOrderId, voidReasonCode)
   })
 }
 
+//Delete order
+async function deleteOrder(VIARE_ORDER_API, headers, viareOrderItemID, itemQuantity){
+
+  var viarePayload = {
+    'authenticationToken':VIARE_TOKEN,
+    'orderItemID': viareOrderItemID,
+    'quantity': itemQuantity
+  }
+
+  return new Promise((resolve, reject) => {
+          soap.createClient(VIARE_ORDER_API, {wsdl_headers: headers}, function(err, client) {
+          if(err){
+              reject(err)
+          }
+          client.DeleteOrderItem(viarePayload, function(err, result) {
+              if(err){
+                  reject(err)
+              }else{
+                  resolve(result)
+              }
+          })
+      })
+})
+}
+
+
+var viareHeader = {
+  'SOAPAction': "http://www.estaronline.com/api/orders/DeleteOrderItem"
+}
 
 
 async function test() {
@@ -175,6 +205,10 @@ async function test() {
 
   var voidReasonCode = "nr";
   var voidOrdersResponse = await voidOrders(VIARE_ORDER_API, header, actualViareOrderId, voidReasonCode);
+
+  var viareOrderItemID = relatedOrdersResponse.RetrieveRelatedOrdersResult.Data.Order[0].OrderItems.OrderItem[0].ID;
+  var cancelOrderItemResponse = await deleteOrder(VIARE_ORDER_API, viareHeader, viareOrderItemID, itemQuantity);
+  console.log("******START******")
   console.log("Order Data: "+ JSON.stringify(orderData));
   console.log("\n");
   console.log("****************************");
@@ -184,6 +218,10 @@ async function test() {
   console.log("\n");
   console.log("voidOrdersResponse: "+JSON.stringify(voidOrdersResponse));
   console.log("\n");
+  console.log("viareOrderItemID: "+viareOrderItemID);
+  console.log("\n");
+  console.log(JSON.stringify(cancelOrderItemResponse));
+  console.log("******END******")
 }
 
 test(); // => viare_order_id = 10580;
