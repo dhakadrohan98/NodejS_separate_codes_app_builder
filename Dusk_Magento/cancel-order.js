@@ -1,7 +1,7 @@
 var axios = require('axios');
 var soap = require('soap');
-var orderId = 207;
-var creditMemoId = 63;
+var orderId = 219;
+var creditMemoId = 75;
 var orderItemsLength=0;
 
 var viareEndpoint = 'https://futura-staging-adr.dusk.com.au/SOAP?service=FuturERS_ADR';
@@ -74,34 +74,59 @@ async function matchingOrderItems(orderId, creditMemoId) {
     creditMemoLength = creditmemoResponse.items.length
     console.log("orderItemsLength: " +orderItemsLength);
     console.log("creditMemoLength: "+creditMemoLength);
-    var i=0,j=0,k=0;
+
+    console.log('Order Response: '+JSON.stringify(orderResponse));
+    console.log("\n");
+    console.log('Credit Memo Response: '+ JSON.stringify(creditmemoResponse));
+    var i=0,k=0;
     var unShippedArray = [];
+    var temp = {};
 
     while(i<orderItemsLength) {
 
         itemQuantityShippedFromOrder = orderResponse.items[i].qty_shipped;
 
-        if(itemQuantityShippedFromOrder < 1) {
+        if(itemQuantityShippedFromOrder == 0) {
             unShippedArray[k] = orderResponse.items[i].sku;
             k++;
         }
         i++;
     }
+    console.log("\n");
     console.log("unShippedArray: "+unShippedArray)
 
-    for(l=0; l<unShippedArray.length; l++) {
+    var unShippedArrayLength = unShippedArray.length;
 
-        // if(creditmemoResponse.items[l] == undefined) {
-        //     break;
-        // }
-        if((creditmemoResponse.items[l] != undefined) && unShippedArray.includes(creditmemoResponse.items[l].sku) == true) {
 
-            var temp = {"orderItemID": creditmemoResponse.items[l].sku, 
-                        "quantity": creditmemoResponse.items[l].qty}
-            finalResponse.push(temp);
+    //comparing length of unShippedArray with creditMemoLength.
+        if(creditMemoLength > unShippedArrayLength) {
+
+        for(j=0; j<creditMemoLength; j++) {
+
+            // if(creditmemoResponse.items[l] == undefined) {
+            //     break;
+            // }
+            if(unShippedArray.includes(creditmemoResponse.items[j].sku) == true) {
+                
+                temp = {"orderItemID": creditmemoResponse.items[j].sku, 
+                            "quantity": creditmemoResponse.items[j].qty};
+                finalResponse.push(temp);
+            }
+        }
+    } else {
+        for(j=0; j<unShippedArray.length; j++) {
+
+            for(k=0; k<creditMemoLength; k++) {
+                if(unShippedArray[j] == creditmemoResponse.items[j].sku) {
+                
+                    temp = {"orderItemID": creditmemoResponse.items[j].sku, 
+                                "quantity": creditmemoResponse.items[j].qty};
+                    finalResponse.push(temp);
+                }
+            }
         }
     }
-
+    console.log("\n");
     console.log("unShippedArray after creditmemo condition: "+ JSON.stringify(finalResponse));
 }
 
