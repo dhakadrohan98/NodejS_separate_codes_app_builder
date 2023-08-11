@@ -1,7 +1,7 @@
 var axios = require('axios');
 var soap = require('soap');
-var orderId = 141;
-var creditMemoId = 51;
+var orderId = 207;
+var creditMemoId = 63;
 var orderItemsLength=0;
 
 var viareEndpoint = 'https://futura-staging-adr.dusk.com.au/SOAP?service=FuturERS_ADR';
@@ -75,26 +75,26 @@ async function matchingOrderItems(orderId, creditMemoId) {
     console.log("orderItemsLength: " +orderItemsLength);
     console.log("creditMemoLength: "+creditMemoLength);
     var i=0,j=0,k=0;
-    var shippedArray = [];
+    var unShippedArray = [];
 
     while(i<orderItemsLength) {
 
         itemQuantityShippedFromOrder = orderResponse.items[i].qty_shipped;
 
-        if(itemQuantityShippedFromOrder > 0) {
-            shippedArray[k] = orderResponse.items[i].sku;
+        if(itemQuantityShippedFromOrder < 1) {
+            unShippedArray[k] = orderResponse.items[i].sku;
             k++;
         }
         i++;
     }
-    console.log("shippedArray: "+shippedArray)
+    console.log("unShippedArray: "+unShippedArray)
 
-    for(l=0; l<shippedArray.length; l++) {
+    for(l=0; l<unShippedArray.length; l++) {
 
         // if(creditmemoResponse.items[l] == undefined) {
         //     break;
         // }
-        if((creditmemoResponse.items[l] != undefined) && shippedArray.includes(creditmemoResponse.items[l].sku) == true) {
+        if((creditmemoResponse.items[l] != undefined) && unShippedArray.includes(creditmemoResponse.items[l].sku) == true) {
 
             var temp = {"orderItemID": creditmemoResponse.items[l].sku, 
                         "quantity": creditmemoResponse.items[l].qty}
@@ -102,7 +102,7 @@ async function matchingOrderItems(orderId, creditMemoId) {
         }
     }
 
-    console.log("shippedArray after creditmemo condition: "+ JSON.stringify(finalResponse));
+    console.log("unShippedArray after creditmemo condition: "+ JSON.stringify(finalResponse));
 }
 
 matchingOrderItems(orderId,creditMemoId);
