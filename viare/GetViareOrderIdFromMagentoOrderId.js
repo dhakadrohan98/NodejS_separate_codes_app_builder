@@ -8,8 +8,8 @@ var ECOMMERCE_API_URL='https//mcstaging.dusk.au/rest/default/V1/';
 var ECOMMERCE_ORDER_ENDPOINT='orders';
 var ECOMMERCE_AUTHORIZED_TOKEN='nq4zr49fhs07xv9584koqyjicyz3yybd';
 var ECOMMERCE_CREDITMEMO_ENDPOINT = 'creditmemo';
-var magentoOrderId = 213;
-var creditMemoId = 66;
+var magentoOrderId = '000000216';
+var creditMemoId = 72;
 var orderItemsLength=0;
 
 
@@ -138,46 +138,7 @@ async function getCreditMemo(creditMemoId){
     }
 }
 
-async function matchingOrderItems(orderId, creditMemoId) {
 
-    var finalResponse = [];
-    var orderResponse = await getOrderDetails(orderId);
-    var creditmemoResponse = await getCreditMemo(creditMemoId);
-
-    orderItemsLength = orderResponse.items.length;
-    creditMemoLength = creditmemoResponse.items.length
-    console.log("orderItemsLength: " +orderItemsLength);
-    console.log("creditMemoLength: "+creditMemoLength);
-    var i=0,j=0,k=0;
-    var unShippedArray = [];
-
-    while(i<orderItemsLength) {
-
-        itemQuantityShippedFromOrder = orderResponse.items[i].qty_shipped;
-
-        if(itemQuantityShippedFromOrder < 1) {
-            unShippedArray[k] = orderResponse.items[i].sku;
-            k++;
-        }
-        i++;
-    }
-    console.log("unShippedArray: "+unShippedArray)
-
-    for(l=0; l<unShippedArray.length; l++) {
-
-        // if(creditmemoResponse.items[l] == undefined) {
-        //     break;
-        // }
-        if((creditmemoResponse.items[l] != undefined) && unShippedArray.includes(creditmemoResponse.items[l].sku) == true) {
-
-            var temp = {"orderItemID": creditmemoResponse.items[l].sku, 
-                        "quantity": creditmemoResponse.items[l].qty}
-            finalResponse.push(temp);
-        }
-    }
-
-    console.log("unShippedArray after creditmemo condition: "+ JSON.stringify(finalResponse));
-}
 
 var viarePayload = {
   'authenticationToken': VIARE_TOKEN,
@@ -256,10 +217,10 @@ async function deleteOrderItem(VIARE_ORDER_API, headers, viareOrderItemID, itemQ
 }
 
 // Matching Order Items
-async function matchingOrderItems(magentoOrderId, creditMemoId) {
+async function matchingOrderItems(orderId, creditMemoId) {
 
     var finalResponse = [];
-    var orderResponse = await getOrderInfo(magentoOrderId);
+    var orderResponse = await getOrderInfo(orderId);
     var creditmemoResponse = await getCreditMemo(creditMemoId);
 
     orderItemsLength = orderResponse.items.length;
@@ -267,34 +228,59 @@ async function matchingOrderItems(magentoOrderId, creditMemoId) {
     console.log("orderItemsLength: " +orderItemsLength);
     console.log("creditMemoLength: "+creditMemoLength);
 
-    var i=0,j=0,k=0;
+    console.log('Order Response: '+JSON.stringify(orderResponse));
+    console.log("\n");
+    console.log('Credit Memo Response: '+ JSON.stringify(creditmemoResponse));
+    var i=0,k=0;
     var unShippedArray = [];
+    var temp = {};
 
     while(i<orderItemsLength) {
 
         itemQuantityShippedFromOrder = orderResponse.items[i].qty_shipped;
 
-        if(itemQuantityShippedFromOrder < 1) {
+        if(itemQuantityShippedFromOrder == 0) {
             unShippedArray[k] = orderResponse.items[i].sku;
             k++;
         }
         i++;
     }
-    console.log("UnshippedArray: "+unShippedArray)
+    console.log("\n");
+    console.log("unShippedArray: "+unShippedArray)
 
-    for(l=0; l<unShippedArray.length; l++) {
+    var unShippedArrayLength = unShippedArray.length;
 
-        // if(creditmemoResponse.items[l] == undefined) {
-        //     break;
-        // }
-        if((creditmemoResponse.items[l] != undefined) && unShippedArray.includes(creditmemoResponse.items[l].sku) == true) {
 
-            var temp = {"orderItemID": creditmemoResponse.items[l].sku, 
-                        "quantity": creditmemoResponse.items[l].qty}
-            finalResponse.push(temp);
+    //comparing length of unShippedArray with creditMemoLength.
+        if(creditMemoLength > unShippedArrayLength) {
+
+        for(j=0; j<creditMemoLength; j++) {
+
+            // if(creditmemoResponse.items[l] == undefined) {
+            //     break;
+            // }
+            if(unShippedArray.includes(creditmemoResponse.items[j].sku) == true) {
+                
+                temp = {"orderItemID": creditmemoResponse.items[j].sku, 
+                            "quantity": creditmemoResponse.items[j].qty};
+                finalResponse.push(temp);
+            }
+        }
+    } else {
+        for(j=0; j<unShippedArray.length; j++) {
+
+            for(k=0; k<creditMemoLength; k++) {
+                if(unShippedArray[j] == creditmemoResponse.items[j].sku) {
+                
+                    temp = {"orderItemID": creditmemoResponse.items[j].sku, 
+                                "quantity": creditmemoResponse.items[j].qty};
+                    finalResponse.push(temp);
+                }
+            }
         }
     }
-    console.log("UnshippedArray after creditmemo condition: "+ JSON.stringify(finalResponse));
+    console.log("\n");
+    console.log("unShippedArray after creditmemo condition: "+ JSON.stringify(finalResponse));
     return finalResponse;
 }
 
@@ -318,31 +304,46 @@ async function main() {
   console.log("subOrderLength: " + subOrderLength);
   for(i=0; i<subOrderLength; i++) {
 
-    var viareSplitOrderDetails = relatedOrdersResponse.RetrieveRelatedOrdersResult.Data.Order[i]; // storing viare order id from relatedOrders API
+    var viareRelatedOrderData = relatedOrdersResponse.RetrieveRelatedOrdersResult.Data;
+    var viareSplitOrderDetails = viareRelatedOrderData.Order[i]; // storing viare order id from relatedOrders API
     var subItemsLength = viareSplitOrderDetails.OrderItems.OrderItem.length;
-    var splitViareOrderId = relatedOrdersResponse.RetrieveRelatedOrdersResult.Data.Order[i].ID;
+    var splitViareOrderId = viareRelatedOrderData.Order[i].ID;
 
     console.log("Splitted Viare Order Id: "+splitViareOrderId);
     console.log("subItemsLength: " + subItemsLength);
 
     for(j=0; j<subItemsLength; j++) {
         
-        var viareOrderItemID = await relatedOrdersResponse.RetrieveRelatedOrdersResult.Data.Order[i].OrderItems.OrderItem[j].ID;
-        var cancelOrderItemResponse = await deleteOrderItem(VIARE_ORDER_API, viareHeader, viareOrderItemID, itemQuantity); //Now try to delete the item. itemQuantity is 1 here.
+        var viareOrderItemID = viareRelatedOrderData.Order[i].OrderItems.OrderItem[j].ID;
+        var viareItemSKU = viareRelatedOrderData.Order[i].OrderItems.OrderItem[j].Style;
+        // viareRelatedOrderData.Order[i].OrderItems.OrderItem[j].Style == matchingOrderItemsResponse[0].orderItemID
+        for(k=0; k<matchingOrderItemsResponse.length; k++) {
+
+            if(viareItemSKU == matchingOrderItemsResponse[k].orderItemID){
+                var viareItemQuantity = viareRelatedOrderData.Order[i].OrderItems.OrderItem[j].Quantity;
+                console.log("Third for loop interation count: " + (k+1));
+                console.log("***********");
+                var cancelOrderItemResponse = await deleteOrderItem(VIARE_ORDER_API, viareHeader, viareOrderItemID, viareItemQuantity); //Now try to delete the item. itemQuantity is 1 here.
+                console.log("\n");
+                console.log(JSON.stringify(cancelOrderItemResponse));
+            }
+        }
+    }
+
+    if(viareRelatedOrderData.Order[i].OrderItems.OrderItem.length >= 0) {
+        var voidOrdersResponse = await voidOrders(VIARE_ORDER_API, header, splitViareOrderId, voidReasonCode); //Void order which viare order we got from above API
         console.log("\n");
-        console.log(JSON.stringify(cancelOrderItemResponse));
+        console.log("voidOrdersResponse: "+JSON.stringify(voidOrdersResponse));
     }
     
-    var voidOrdersResponse = await voidOrders(VIARE_ORDER_API, header, splitViareOrderId, voidReasonCode); //Void order which viare order we got from above API
-    console.log("\n");
-    console.log("voidOrdersResponse: "+JSON.stringify(voidOrdersResponse));
-  } 
+} 
 
   console.log("******START******")
   console.log("Matching Order Items Response: " + JSON.stringify(matchingOrderItemsResponse));
   console.log("\n")
 //   console.log("Magento Order Data: "+ JSON.stringify(orderData));
 //   console.log("\n");
+  console.log("Related Orders Response: " +relatedOrdersResponse);
   console.log("****************************");
   console.log("viareOrderId=> " + JSON.stringify(viareOrderId));
   console.log("****************************");
