@@ -8,8 +8,8 @@ var ECOMMERCE_API_URL='https//mcstaging.dusk.au/rest/default/V1/';
 var ECOMMERCE_ORDER_ENDPOINT='orders';
 var ECOMMERCE_AUTHORIZED_TOKEN='nq4zr49fhs07xv9584koqyjicyz3yybd';
 var ECOMMERCE_CREDITMEMO_ENDPOINT = 'creditmemo';
-var magentoOrderId = 207;
-var creditMemoId = 63;
+var magentoOrderId = 213;
+var creditMemoId = 66;
 var orderItemsLength=0;
 
 
