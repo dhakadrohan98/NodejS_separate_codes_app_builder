@@ -59,7 +59,7 @@ function generatePayloadForOrderExist(ecommerce_order_data, token)
     var payload = orderExist;
     payload['authenticationToken'] = ""+token;
     //payload['externalOrderID'] = ""+order.entity_id;
-    payload['externalOrderID'] = '000000210';
+    payload['externalOrderID'] = '000000207';
 
     return payload;
 }
