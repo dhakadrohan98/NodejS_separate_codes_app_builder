@@ -292,6 +292,8 @@ var viareHeader = {
 
 async function main() {
 //   var orderData = await getOrderInfo(magentoOrderId); //Get order info from magento.
+  var magentoOrderDataResponse = await getOrderInfo(magentoOrderId); 
+  var magentoCreditMemoResponse = await getCreditMemo(creditMemoId);
   var matchingOrderItemsResponse = await matchingOrderItems(magentoOrderId, creditMemoId); 
   var viareOrderId = await isOrderExist(VIARE_ORDER_API, header, viarePayload); // get ViareOrder id from viare by passing magento id
 
