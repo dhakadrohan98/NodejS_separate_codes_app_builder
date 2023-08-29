@@ -1,6 +1,9 @@
 const soap = require('soap')
 const axios = require('axios')
-const NodeCache = require( "node-cache" );
+// const NodeCache = require( "node-cache" );
+// const myCache = new NodeCache();
+const memoryCache = require('memory-cache');
+
 
 var d1 = new Date();
 var d1t1 = parseInt(d1.getTime() / 1000);
@@ -188,26 +191,57 @@ async function createRMA(authenticationToken, rmaDetails, customerDetails, sku){
         }
 }
 
+async function getCachedToken() {
+    const cachedToken = cache["tccRmaToken"];
+
+    if (cachedToken && cachedToken.expiry > Date.now()) {
+        return cachedToken.token;
+    }
+
+    return null;
+}
+
+async function cacheToken(token, ttl) {
+    cache["tccRmaToken"] = {
+        token,
+        expiry: Date.now() + ttl
+    };
+}
+
+const cache = {};
 async function main(){
+
+    var authenticationToken = await getCachedToken();
+
+    if (!authenticationToken) {
+        console.log("Fetching new token...");
+        var authenticationResult = await authenticate();
+        authenticationToken = authenticationResult.Payload.AuthenticationToken;
+        await cacheToken(authenticationToken, 10000); // Cache for 10 seconds
+    }
+
+    console.log("Final Token:", authenticationToken);
+}
+
+//==> memoryCache library:
+
     // var final = await authenticate();
     // var authenticationToken = final.Payload.AuthenticationToken;
     // var results = await createRMA(authenticationToken, rmaDetails);
     // console.log(JSON.stringify(results));
-            let authenticationToken;
-            //caching mechanism
-            const myCache = new NodeCache();  
-            console.log("before cache: "+ myCache.has('authToken'));
-            if(myCache.has('authToken')) {
-              authenticationToken = myCache.get('authToken');
-            }
-            else {
-              var authenticationResult = await authenticate(); 
-              authenticationToken = authenticationResult.Payload.AuthenticationToken;
-              myCache.set("authToken",authenticationToken, 6000);
-            }
-            result = authenticationToken;
-            console.log("after cache: "+myCache.has('authToken'));
-}
+
+            // var authenticationToken = memoryCache.get("tccRmaToken");
+            // console.log("Cached Token:" + authenticationToken);
+
+            // if (authenticationToken == null) {
+            //     console.log("Fetching new token...");
+            //     var authenticationResult = await authenticate();
+            //     authenticationToken = authenticationResult.Payload.AuthenticationToken;
+            //     memoryCache.put("tccRmaToken", authenticationToken, 10000); // Cache for 10 seconds
+            // }
+            // console.log("Final Token:" + authenticationToken);
+
+
 
 main();
 
