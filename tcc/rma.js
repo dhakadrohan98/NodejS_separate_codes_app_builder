@@ -1,5 +1,9 @@
 const soap = require('soap')
 const axios = require('axios')
+const NodeCache = require( "node-cache" );
+
+var d1 = new Date();
+var d1t1 = parseInt(d1.getTime() / 1000);
 
 var rmaDetails = {
     "increment_id": "000000006",
@@ -90,21 +94,30 @@ async function authenticate(){
     }
 }
 
-async function createRMA(authenticationToken, rmaDetails){
+async function createRMA(authenticationToken, rmaDetails, customerDetails, sku){
 
-    var date = new Date().toLocaleDateString();
+    const currentDate = new Date();
+    // Increment the date by 1 day (in milliseconds)
+    const nextDayDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+    const nextDate = nextDayDate.getTime() / 1000;
+
+    var dateString = rmaDetails.date_requested;
+    const epochTimestamp = new Date(dateString).getTime() / 1000;
+    var order_id = rmaDetails.order_id;
+    var state = customerDetails.addresses[0].region.region_code;
+
     //prepairing payload
     var payload = {
             "AuthenticationToken": authenticationToken,
             "Payload": {
             "ContainerNumber": null,
-            "DateCreated": rmaDetails.date_requested,
-            "DateModified": rmaDetails.date_requested,
+            "DateCreated": epochTimestamp,
+            "DateModified": epochTimestamp,
             
-            "Description": rmaDetails.items[0].reason,
+            "Description": order_id,
             "ForeignJobID": 123,
-            "ForeignReference": rmaDetails.entity_id,
-            "ScheduledReceivingDate": date,
+            "ForeignReference": null,
+            "ScheduledReceivingDate": nextDate,
             "ID": null,
             "Items": [
             {
@@ -114,9 +127,9 @@ async function createRMA(authenticationToken, rmaDetails){
             "CollectionDate": null,
             "Confidential": null,
             "CountIndividualItems": null,
-            "DeliveryDueDate": date,
+            "DeliveryDueDate": nextDate,
             "Description": rmaDetails.order_id,
-            "ForeignFulfilmentID": rmaDetails.items[0].rma_entity_id,
+            "ForeignFulfilmentID": rmaDetails.items[0].entity_id,
             "ForeignReference": null,
             "ID": null,
             "IsBulkyItem": null,
@@ -133,7 +146,7 @@ async function createRMA(authenticationToken, rmaDetails){
             "Quarantined": null,
             "SampleRequired": null,
             "Source": "",
-            "StockCode": "need to call one more API to fetch sku",
+            "StockCode": sku,
             "StockLocationID": 1,
             "SubCategory": null,
             "SupplierLocation": null,
@@ -143,13 +156,13 @@ async function createRMA(authenticationToken, rmaDetails){
             
             ],
             "JobReferenceID": "",
-            "RequestorEmail": rmaDetails.customer_custom_email,
-            "RequestorName": "customer to fetch from customer id",
-            "SenderAddress": "Need to fetch",
-            "SenderName": "customer name to fetch",
-            "SenderPostcode": "2068",
-            "SenderState": "NSW",
-            "SenderSuburb": "NORTH WILLOUGHBY",
+            "RequestorEmail": customerDetails.email,
+            "RequestorName": customerDetails.firstname,
+            "SenderAddress": customerDetails.addresses[0].street[0],
+            "SenderName": customerDetails.firstname,
+            "SenderPostcode": customerDetails.addresses[0].postcode,
+            "SenderState": customerDetails.addresses[0].region.region_code,
+            "SenderSuburb": customerDetails.addresses[0].city,
             "Status": 10,
             "StockLocationID": null,
             "WarehouseLocationID": 1
@@ -171,15 +184,31 @@ async function createRMA(authenticationToken, rmaDetails){
             return response.data;
         }
       } catch (error) {
-        console.error(error.message);
+        console.error("Error: "+error.message);
         }
 }
 
 async function main(){
-    var final = await authenticate();
-    var authenticationToken = final.Payload.AuthenticationToken;
-    var results = await createRMA(authenticationToken, rmaDetails);
-    console.log(JSON.stringify(results));
+    // var final = await authenticate();
+    // var authenticationToken = final.Payload.AuthenticationToken;
+    // var results = await createRMA(authenticationToken, rmaDetails);
+    // console.log(JSON.stringify(results));
+            let authenticationToken;
+            //caching mechanism
+            const myCache = new NodeCache();  
+            console.log("before cache: "+ myCache.has('authToken'));
+            if(myCache.has('authToken')) {
+              authenticationToken = myCache.get('authToken');
+            }
+            else {
+              var authenticationResult = await authenticate(); 
+              authenticationToken = authenticationResult.Payload.AuthenticationToken;
+              myCache.set("authToken",authenticationToken, 6000);
+            }
+            result = authenticationToken;
+            console.log("after cache: "+myCache.has('authToken'));
 }
 
 main();
+
+module.exports = { createRMA, rmaDetails };
