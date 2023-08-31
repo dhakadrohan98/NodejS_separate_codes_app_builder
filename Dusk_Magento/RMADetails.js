@@ -67,8 +67,7 @@ async function getOrderInfo(params, order_id){
         headers: {
             'Authorization': 'Bearer '+params.ECOMMERCE_AUTHORIZED_TOKEN,
             'Content-Type': 'application/json'
-        },
-        data : {}
+        }
     };
 
     try{
@@ -99,7 +98,7 @@ async function main(){
     }    
 
     var result = await createRMA(authenticationToken, rmaDetails, customerDetails, sku);
-    console.log(JSON.stringify(result));
+    console.log(JSON.stringify(orderDetails));
     
 }
 main();
