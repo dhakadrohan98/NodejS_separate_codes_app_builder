@@ -225,12 +225,14 @@ async function customerDataPayload(params, api_endpoint, giveXNumber, customerDa
 
     // api_endpoint = "dc_941";
     var length = customerData.addresses.length;
+    var customerAddress;
+    var telephoneNo;
     //Storing customer's city & telephone no. of billing address
     for(i=0; i<length; i++) {
         if(customerData.addresses.default_billing != undefined && 
             customerData.addresses.default_billing==true) {
-            var customerAddress = customerData.addresses[i].city;
-            var telephoneNo = customerData.addresses[i].telephone;
+            customerAddress = customerData.addresses[i].city;
+            telephoneNo = customerData.addresses[i].telephone;
         }
     }
     
@@ -240,16 +242,16 @@ async function customerDataPayload(params, api_endpoint, giveXNumber, customerDa
         params.GIVEX_USERID,
         params.GIVEX_PASSWORD,
         giveXNumber,
-        '', //Member title (*optional)
-        customerData.firstname,
-        '', //Customer middlename (*optional)
-        customerData.lastname,,
-        customerAddress,
-        telephoneNo,
-        customerData.email,
-        " ", //Customer birthDate
+        'customer', //Member title 
+        customerData.firstname+"KUM",
+        'kumari', //Customer middlename 
+        customerData.lastname,
+        "76 goregavyui",
+        "6261129299893",
+        "akansha.a@sigmainfo.net", //customerData.email (*optional)
+        "2018-09-01", //Customer birthDate (*optional)
         " ", // SMS contact number
-        customerData.email,
+        " ", //Email contact answer
         " ", //Mail contact answer
         " ", //member phone
         " ", //Referring member number
@@ -278,3 +280,8 @@ module.exports = {
     call,
     customerDataPayload
 }
+
+
+var updatecustomer = await getCustomerDataById(params,params.data.value.futura_id);
+var duskpayload = await duskportalCustomerPayload(params, updatecustomer,customerid)
+var duskcustomercreate = await SendCustomerData(params, duskpayload);
