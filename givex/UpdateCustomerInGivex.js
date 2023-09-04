@@ -1,5 +1,5 @@
 const axios  = require('axios');
-const {customerDataPayload, call} = require('../givex')
+const {customerDataPayload, call, staticPayload} = require('../givex')
 
 var params = {
     "ECOMMERCE_API_URL":"https://mcstaging.dusk.au/rest/sv_dusk_au_en/V1/",
@@ -52,14 +52,17 @@ async function updateCustomer(){
 
 async function main(){
     // var params.data.value.entity_id = 6;
-    var customerInfo = await getCustomer(params , 6);
-    var givexNumber = "60586308721100032507";
-    //calling givex API to update customer details
-    var customerPayloadOfGivex = await customerDataPayload(params,'dc_941',givexNumber, customerInfo); 
-    var givexUpdateResult  = await call(params, 'dc_941', customerPayloadOfGivex);
-
+    var customerInfo = await getCustomer(params , 126);
+    var givexNumber = "60586305549100031908";
+    
+    var oldPayload = await customerDataPayload(params,'dc_941',givexNumber, customerInfo);
+    // var customerPayloadOfGivex = await staticPayload(params,'dc_941',givexNumber, customerInfo);
+    var givexUpdateResult  = await call(params, 'dc_941', oldPayload);
+    console.log("OldPayload: "+"\n");
+    console.log(oldPayload);
+    console.log("\n");
     console.log(givexUpdateResult);
-    console.log(customerPayloadOfGivex);
+
 }
 
 main();

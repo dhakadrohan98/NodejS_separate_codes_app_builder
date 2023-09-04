@@ -43,12 +43,12 @@ function duskportalCustomerPayload(params, futuracustomer, customerId)
     var data = params.data.value;
 
     return {
-        "Futura_Number": data.futura_id,
+        "Futura_Number": "700440571",
         "Futura_Name": futuracustomer.customer.web_kde_index,
         "Card_Type": "",
-        "Card_No": data.card_no,
-        "ISO_Serial": data.givex[6],
-        "Givex_No": data.givex[2],
+        "Card_No": "0987654321",
+        "ISO_Serial": "0987654321", //data.givex[6]
+        "Givex_No": "60586308721100032507",
         "Magento_No": customerId,
         "Expiry_Date": getdateasstring(futuracustomer.comon.web_add_sperrdatum),
         "Expiry_Text": "dusk Rewards Expiry Date",
