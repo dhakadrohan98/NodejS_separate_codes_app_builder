@@ -130,13 +130,13 @@ function payloadForPointReversalRequest(params, previousReq)
 }
 
 // Call all the GIVEX APIs
-// Call all the GIVEX APIs
 async function call(params, method, payload)
 {
     return new Promise((resolve, reject) => {
         xmlrpc.client(params.GIVEX_ENDPOINT, method, payload, "xml", function (err, data) {        
             if (err) {        
-                reject(err);        
+                reject(err);   
+                return;     
             } else {        
                 resolve(data);
             }        
@@ -229,42 +229,75 @@ async function customerDataPayload(params, api_endpoint, giveXNumber, customerDa
     var telephoneNo;
     //Storing customer's city & telephone no. of billing address
     for(i=0; i<length; i++) {
-        if(customerData.addresses.default_billing != undefined && 
-            customerData.addresses.default_billing==true) {
-            customerAddress = customerData.addresses[i].city;
+        if(customerData.addresses[i].default_billing != undefined && 
+            customerData.addresses[i].default_billing==true) {
+            //if customer address is set as billing address then store street, city and region in customerAddress variable. 
+            customerAddress = customerData.addresses[i].street[0] +", "+customerData.addresses[i].city+", "+
+                              customerData.addresses[i].region.region;
             telephoneNo = customerData.addresses[i].telephone;
         }
     }
     
-    var result = [ 
+    return [ 
         params.GIVEX_LANGUAGECODE,
-        api_endpoint,
+        generateTransactionCode(api_endpoint),
         params.GIVEX_USERID,
         params.GIVEX_PASSWORD,
         giveXNumber,
-        'customer', //Member title 
-        customerData.firstname+"KUM",
-        'kumari', //Customer middlename 
+        '', //Member title 
+        customerData.firstname,
+        '', //Customer middlename 
         customerData.lastname,
-        "76 goregavyui",
-        "6261129299893",
-        "akansha.a@sigmainfo.net", //customerData.email (*optional)
-        "2018-09-01", //Customer birthDate (*optional)
-        " ", // SMS contact number
-        " ", //Email contact answer
-        " ", //Mail contact answer
-        " ", //member phone
-        " ", //Referring member number
-        " ", //Security code
-        " ", //member_type
-        " ", //member_status
-        " ", //member_type
-        " ", //member_delivery_method 
-        " ", //customer_company
-        " ", //customer_pos_notes
-        " ", //comment
+        customerAddress,
+        telephoneNo,
+        customerData.email, //customerData.email 
+        "", //Customer birthDate 
+        "", // SMS contact number (*optional)
+        "", //Email contact answer
+        "", //Mail contact answer
+        "", //member phone
+        "", //Referring member number
+        "", //Security code
+        "", //member_type
+        "", //member_status
+        "", //member_type
+        "", //member_delivery_method 
+        "", //customer_company
+        "", //customer_pos_notes
+        "", //comment
     ];
-    return result;
+}
+
+//Passing static data (for general purpose)
+async function staticPayload(params, api_endpoint, giveXNumber, customerData){
+    return [ 
+        "en",
+        "qwerty4545454545qq",
+        "228808",
+        "FEFijCf8d6kps22r",
+        "6058634-10000655",
+        '', //Member title 
+        "Rohan",
+        'Kumar', //Customer middlename 
+        "Dhakad",
+        "SchemeNo",
+        "98989123456",
+        "praveenverma@gmail.com", //customerData.email (*optional)
+        "", //Customer birthDate (*optional)
+        "", // SMS contact number
+        "", //Email contact answer
+        "", //Mail contact answer
+        "", //member phone
+        "", //Referring member number
+        "", //Security code
+        "", //member_type
+        "", //member_status
+        "", //member_type
+        "", //member_delivery_method 
+        "Sigma InfoSolutions", //customer_company
+        "", //customer_pos_notes
+        "This is a test comment", //comment
+    ];
 }
 
 //noinspection JSAnnotator
@@ -278,10 +311,11 @@ module.exports = {
     payloadForPoints,
     payloadForPointReversalRequest,
     call,
-    customerDataPayload
+    customerDataPayload,
+    staticPayload
 }
 
 
-var updatecustomer = await getCustomerDataById(params,params.data.value.futura_id);
-var duskpayload = await duskportalCustomerPayload(params, updatecustomer,customerid)
-var duskcustomercreate = await SendCustomerData(params, duskpayload);
+// var updatecustomer = await getCustomerDataById(params,params.data.value.futura_id);
+// var duskpayload = await duskportalCustomerPayload(params, updatecustomer,customerid)
+// var duskcustomercreate = await SendCustomerData(params, duskpayload);
