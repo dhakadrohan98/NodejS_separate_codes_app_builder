@@ -54,7 +54,7 @@ function duskportalCustomerPayload(params, futuracustomer, customerId)
         "Expiry_Text": "dusk Rewards Expiry Date",
         "First_Name": futuracustomer.address.web_ans_name1,
         "Last_Name": futuracustomer.address.web_ans_name2,
-        "Email": futuracustomer.address.web_ans_email,
+        "Email": "rohan+5.dhakad@sigmainfo.net",
         "Street_1": futuracustomer.address.web_ans_strasse,
         "Street_2": futuracustomer.address.web_ans_strasse_2,
         "Suburb": futuracustomer.address.web_ans_ort,
@@ -119,7 +119,7 @@ async function SendCustomerData(params, payload){
     // Configure the request
     var config = {
         timeout: params.SOAP_TIMEOUT,
-        method: 'post',
+        method: 'POST',
         url: url.replace(/\\\//g, "/"), // Normalize any double backslashes to single slashes
         headers: {
             'Authorization': 'Bearer ' + params.DUSK_PORTAL_AUTH_TOKEN,

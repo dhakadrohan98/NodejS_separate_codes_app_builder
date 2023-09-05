@@ -19,8 +19,7 @@ var params = {
     "DUSK_PORTAL_CREATE_UPDATE_MEMBER":"members/create-or-update",
     "DUSK_PORTAL_AUTH_TOKEN":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vc3RhZ2luZy1wb3J0YWwuZHVzay5jb20uYXUvaW5kZXgucGhwL2FwaS9hdXRoL2xvZ2luIiwiaWF0IjoxNjkxMTM0MjAyLCJuYmYiOjE2OTExMzQyMDIsImp0aSI6Img1NXNrZlFPamQwZ2FXU0ciLCJzdWIiOjEsInBydiI6IjYyZGFjM2UzMDg0YTcxZmJhMTMxMWQ0MDM5YzZjYTQ3MmQ0MTZmOTciLCJuYW1lIjoiYWRtaW4iLCJpc19hZG1pbiI6dHJ1ZSwiZnV0dXJhX3N0b3JlX2lkIjoiMSIsImFkbWluX3R5cGUiOjF9.A2vnXKPyrG23uf4F6x3Rary7J5KdZX_BgY9dY8eNic0",
     "DUSK_PORTAL_RESERVE_CARD_ENDPOINT":"members/digital-cards/reserve-number",
-    "DUSK_PORTAL_CREATE_UPDATE_MEMBER":"members/create-or-update",
-    "SOAP_TIMEOUT":7000,
+    "SOAP_TIMEOUT":20000,
     "data":{
         "value":{
             "futuraId":"704732351",
@@ -181,12 +180,39 @@ var payload = {
     }
 };
 
+var duskpayload = {
+    "Birthdate": "20080806",
+    "Card_No": "783883483782",
+    "Card_Type": "credit",
+    "Email": "rohan+5.dhakad@sigmainfo.net",
+    "Enrolment_Date": "18991230",
+    "Expiry_Date": "18991230",
+    "Expiry_Text": "dusk Rewards Expiry Date",
+    "First_Name": "Rohan",
+    "Futura_Name": "DHAKAD,ROHAN,DOREEN",
+    "Futura_Number": "704732351",
+    "Givex_No": "2782382438",
+    "ISO_Serial": "0987654321",
+    "Last_Name": "Sigma",
+    "Magento_No": "126",
+    "Mobile": "6261122929",
+    "Postcode": "63762",
+    "Renew_Date": "18991230",
+    "Signup_Date": "20230906",
+    "State": "",
+    "Street_1": "2 Testolin Place",
+    "Street_2": "",
+    "Suburb": "Berlin"
+}
+
 
 async function main(){
     //Updating dusk portal with latest customer data
-    // var updatecustomer = await getCustomerDataById(params,params.data.value.futuraId);
+    // var updatecustomer = await getCustomerDataById(params,"126");
+    // console.log(updatecustomer);
+    // console.log("\n");
     // var duskpayload = await duskportalCustomerPayload(params, updatecustomer,params.customerID)
-    var duskcustomercreate = await SendCustomerData(params, payload);
+    var duskcustomercreate = await SendCustomerData(params, duskpayload);
     console.log(duskcustomercreate);
 }
 
