@@ -53,7 +53,7 @@ async function updateCustomer(){
 async function main(){
     // var params.data.value.entity_id = 6;
     var customerInfo = await getCustomer(params , 126);
-    var givexNumber = "60586305549100031908";
+    var givexNumber = "60586308721100032507";
     
     var oldPayload = await customerDataPayload(params,'dc_941',givexNumber, customerInfo);
     // var customerPayloadOfGivex = await staticPayload(params,'dc_941',givexNumber, customerInfo);

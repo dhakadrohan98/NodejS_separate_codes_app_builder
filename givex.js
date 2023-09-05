@@ -252,7 +252,7 @@ async function customerDataPayload(params, api_endpoint, giveXNumber, customerDa
         telephoneNo,
         customerData.email, //customerData.email 
         "", //Customer birthDate 
-        "", // SMS contact number (*optional)
+        "", //SMS contact number (*optional)
         "", //Email contact answer
         "", //Mail contact answer
         "", //member phone
