@@ -1,0 +1,32 @@
+{
+    "data": {
+        "value": {
+            "card_no": "60586308564100032539",
+            "order_id": 870,
+            "futura_id": 704856415,
+            "givex": [
+                "dc_946.t5X1PO7AtqlfmcC",
+                "0",
+                "7335168",
+                "John",
+                "Doe",
+                "2023-09-01",
+                "6058630-10003253",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ]
+        }
+    },
+    "id": "ce6cc498-f707-4600-8147-bdf5444041f9",
+    "source": "urn:uuid:ce6cc498-f707-4600-8147-bdf5444041f9",
+    "specversion": "1.0",
+    "type": "com.givex.loyaltyupdatedata",
+    "datacontenttype": "application/json",
+    "time": "2023-09-01T06:41:30.595Z",
+    "event_id": "d7801854-7e00-42da-ad9f-2f5b17df0c92",
+    "recipient_client_id": "4d53dc14efd54109aa2f112c1663feb3"
+}
