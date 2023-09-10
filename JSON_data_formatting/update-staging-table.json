@@ -1,0 +1,229 @@
+{
+    "customerDuskPayload": {
+        "address": {
+            "web_ans_anrede": "",
+            "web_ans_com_mode": "0",
+            "web_ans_count": 1,
+            "web_ans_county": "",
+            "web_ans_email": "rohan.dhakad+3@sigmainfo.net",
+            "web_ans_land": "1",
+            "web_ans_m_typ": 0,
+            "web_ans_modem": "",
+            "web_ans_name1": "Rohan",
+            "web_ans_name2": "Dhakad",
+            "web_ans_nummer": 704856434,
+            "web_ans_ort": "Victoria",
+            "web_ans_plz": "4000",
+            "web_ans_plz_zusatz": "1",
+            "web_ans_postfach": "",
+            "web_ans_postfach_plz": "",
+            "web_ans_postfach_plz_zusatz": "",
+            "web_ans_postfach_valid": 0,
+            "web_ans_sachbearbeiter": "",
+            "web_ans_sachgeburtstag": "2023-07-13T00:00:00.000Z",
+            "web_ans_strasse": "Street-10",
+            "web_ans_strasse_2": "",
+            "web_ans_telefax": "",
+            "web_ans_telefon": "121-90890",
+            "web_ans_telefon2": "",
+            "web_ans_titel": "",
+            "web_ans_typ": 3,
+            "web_error": {
+                "web_err_nr": 0,
+                "web_err_txt": ""
+            }
+        },
+        "comon": {
+            "web_add_bankkonto": "",
+            "web_add_bankleitzahl": "",
+            "web_add_bankname": "",
+            "web_add_bic": "",
+            "web_add_bildname": "",
+            "web_add_clog_date_time": "2023-09-08T23:14:11.000Z",
+            "web_add_clog_user": 0,
+            "web_add_datum_user": "1899-12-30T00:00:00.000Z",
+            "web_add_export_datum": "1899-12-30T00:00:00.000Z",
+            "web_add_externid": "",
+            "web_add_fibuexport_first": "1899-12-30T00:00:00.000Z",
+            "web_add_fibuexport_last": "1899-12-30T00:00:00.000Z",
+            "web_add_geschlecht": 0,
+            "web_add_gutschrift": 0,
+            "web_add_iban": "",
+            "web_add_import_datum": "1899-12-30T00:00:00.000Z",
+            "web_add_inactive": 0,
+            "web_add_index": "DOE,JOHN",
+            "web_add_info_nodisplay": 0,
+            "web_add_karte_ausgegeben": "1899-12-30T00:00:00.000Z",
+            "web_add_karte_erfasst": "1899-12-30T00:00:00.000Z",
+            "web_add_kreditkarte": "60586305964100032582",
+            "web_add_kundennummer": "7335818",
+            "web_add_last_pay_datum": "1899-12-30T00:00:00.000Z",
+            "web_add_last_rg_datum": "1899-12-30T00:00:00.000Z",
+            "web_add_last_sammelrg_datum": "1899-12-30T00:00:00.000Z",
+            "web_add_loesch_datum": "1899-12-30T00:00:00.000Z",
+            "web_add_manumahnung": 0,
+            "web_add_master_nummer": 0,
+            "web_add_master_typ": 0,
+            "web_add_nummer": 704856434,
+            "web_add_obild": "",
+            "web_add_obild_ext": "",
+            "web_add_ohne_bonus": 0,
+            "web_add_rg_druckformat": 0,
+            "web_add_rg_druckrabatt": 0,
+            "web_add_sperrdatum": "2025-09-06T00:00:00.000Z",
+            "web_add_sperrgrund": "dusk Rewards Expiry Date",
+            "web_add_sprache": "",
+            "web_add_status": 2,
+            "web_add_typ": 3,
+            "web_add_ulog_date_time": "2023-09-08T23:14:11.000Z",
+            "web_add_ulog_user": 0,
+            "web_add_vfw_bereich": 0,
+            "web_add_werbung": 0,
+            "web_add_wf_date_time_1": "1899-12-30T00:00:00.000Z",
+            "web_add_wf_date_time_2": "1899-12-30T00:00:00.000Z",
+            "web_add_wf_date_time_3": "1899-12-30T00:00:00.000Z",
+            "web_add_wf_flags": 0,
+            "web_add_wf_id": 0,
+            "web_add_wf_status": 0,
+            "web_add_zahlart": 0,
+            "web_add_zahlintcount": 0,
+            "web_add_zahlinttyp": 0,
+            "web_add_zahlziel": 0,
+            "web_error": {
+                "web_err_nr": 0,
+                "web_err_txt": ""
+            }
+        },
+        "customer": {
+            "web_error": {
+                "web_err_nr": 0,
+                "web_err_txt": ""
+            },
+            "web_kde_berater": 0,
+            "web_kde_egsteuernr": "",
+            "web_kde_eigen_page": 0,
+            "web_kde_eigensch": "",
+            "web_kde_eigensch_aend": 0,
+            "web_kde_eigensch_typ": 0,
+            "web_kde_fasteuernr": "",
+            "web_kde_filiale": 0,
+            "web_kde_haendler": 0,
+            "web_kde_index": "DOE,JOHN",
+            "web_kde_keine_ust": 0,
+            "web_kde_kondition": "",
+            "web_kde_konto": 0,
+            "web_kde_kreditlimit": 0,
+            "web_kde_kreditvers": "",
+            "web_kde_land": "1",
+            "web_kde_nummer": 704856434,
+            "web_kde_plz_index": "4000",
+            "web_kde_preisstufe": 0,
+            "web_kde_prio": 0,
+            "web_kde_provision": 0,
+            "web_kde_rab_regel": 1,
+            "web_kde_rabatt": 0,
+            "web_kde_region": "0",
+            "web_kde_skonto": 0,
+            "web_kde_skonto_frist": 0,
+            "web_kde_tour": 0,
+            "web_kde_typ": 3,
+            "web_kde_vertreter": 0,
+            "web_kde_waehrung": ""
+        }
+    },
+    "futurastagecreate": {
+        "card_exp_date": null,
+        "created_at": null,
+        "email": null,
+        "futura_id": null,
+        "givex_id": null,
+        "id": null,
+        "memership_card_no": null,
+        "updated_at": null
+    },
+    "magecustomer": {
+        "addresses": [],
+        "created_at": "2023-08-01 11:45:30",
+        "created_in": "Default Store View",
+        "custom_attributes": [
+            {
+                "attribute_code": "reward_update_notification",
+                "value": "1"
+            },
+            {
+                "attribute_code": "erp_customer_id",
+                "value": "704856434"
+            },
+            {
+                "attribute_code": "givex_number",
+                "value": "60586306335100032573"
+            },
+            {
+                "attribute_code": "rewards_expiry_date",
+                "value": "2027-09-08"
+            }
+        ],
+        "disable_auto_group_change": 0,
+        "dob": "2023-07-13",
+        "email": "rohan.dhakad+3@sigmainfo.net",
+        "extension_attributes": {
+            "is_subscribed": false
+        },
+        "firstname": "Rohan",
+        "gender": 0,
+        "group_id": 1,
+        "id": 54,
+        "lastname": "Dhakad",
+        "store_id": 1,
+        "updated_at": "2023-09-08 12:50:13",
+        "website_id": 1
+    },
+    "magentoId": 54,
+    "magentostagetable": {
+        "card_exp_date": "2027-09-08 00:00:00",
+        "created_at": null,
+        "email": "rohan.dhakad+3@sigmainfo.net",
+        "futura_id": "704856434",
+        "givex_id": "7335818",
+        "id": 54,
+        "memership_card_no": "60586306335100032573",
+        "updated_at": null
+    },
+    "updateCustomerDataResult": {
+        "addresses": [],
+        "created_at": "2023-08-01 11:45:30",
+        "created_in": "Default Store View",
+        "custom_attributes": [
+            {
+                "attribute_code": "reward_update_notification",
+                "value": "1"
+            },
+            {
+                "attribute_code": "erp_customer_id",
+                "value": "704856434"
+            },
+            {
+                "attribute_code": "givex_number",
+                "value": "60586306335100032573"
+            },
+            {
+                "attribute_code": "rewards_expiry_date",
+                "value": "2027-09-08 00:00:00"
+            }
+        ],
+        "disable_auto_group_change": 0,
+        "dob": "2023-07-13",
+        "email": "rohan.dhakad+3@sigmainfo.net",
+        "extension_attributes": {
+            "is_subscribed": false
+        },
+        "firstname": "Rohan",
+        "gender": 0,
+        "group_id": 1,
+        "id": 54,
+        "lastname": "Dhakad",
+        "store_id": 1,
+        "updated_at": "2023-09-08 12:57:57",
+        "website_id": 1
+    }
+}
