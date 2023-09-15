@@ -5,10 +5,10 @@ var params = {
 };
 
 var storesArray = [100,102,103,109];
-var skuArray = [502062092];
+var skuArray = [50121564,50209484];
 var skuArrayLength = skuArray.length;
-//50209484, 50123063,50210244,50121564,50209484
-
+//50209484, 50123063,50121564
+// Invalid numbers => [50210244]
 var main_result = {}
 
 async function clickAndCollect(params, skuArray, storesArray) {
@@ -28,26 +28,25 @@ async function clickAndCollect(params, skuArray, storesArray) {
         const response = await Promise.all(requests);
         lines.push(423)
   
-        var tempArr=[];
         var k=0;
         lines.push(427)
         response.map((item) => {
             var i=0;
-            while(i<skuArrayLength) {
+            var tempArr=[];
+            while(i<item.data.length) {
                 lines.push(431)
                 var branchVal =item.data[i].Branch;
                 var actualVal =item.data[i].Barcodes[0].Value;
                 tempArr[i] = {"Branch": branchVal,"qty":actualVal};
                 i++;
             }
-            if(skuArrayLength == i){
                 lines.push(438)
                 var sku = skuArray[k];
                 finalResponse[sku] = tempArr;
+                console.log(finalResponse);
                 k++;
-            }
            });    
-           lines.push(444)        
+           lines.push(444)          
       } 
       catch (error) {
         finalResponse = error.message
