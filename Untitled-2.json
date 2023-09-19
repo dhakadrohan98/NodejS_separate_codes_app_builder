@@ -1,19 +1,252 @@
-{
-    "web_search_customerResult": {
-        "Tweb_search_kde_fld": [
-            {
-                "web_flds": {
-                    "string": [
-                        "704732395",
-                        "rohandhakad1998@gmail.com",
-                        "3"
-                    ]
-                },
-                "web_error": {
-                    "web_err_nr": 0,
-                    "web_err_txt": ""
-                }
-            }
-        ]
-    }
-}
+[
+  {
+    status: 200,
+    statusText: 'OK',
+    headers: AxiosHeaders {
+      date: 'Wed,
+      13 Sep 2023 06: 58: 09 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'transfer-encoding': 'chunked',
+      connection: 'close',
+      'cache-control': 'no-cache',
+      pragma: 'no-cache',
+      expires: '-1',
+      'x-frame-options': 'SAMEORIGIN',
+      'x-content-type-options': 'NOSNIFF',
+      'x-xss-protection': '1',
+      'content-security-policy': "default-src  * 'unsafe-inline' 'unsafe-eval' ; img-src * blob: data: 'unsafe-inline' ; font-src * data: 'unsafe-inline' ; media-src * blob: 'unsafe-inline' ; frame-src * data: 'unsafe-inline' 'unsafe-eval' ;",
+      'cf-cache-status': 'DYNAMIC',
+      'report-to': '{
+        "endpoints": [
+          {
+            "url": "https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=WEwZU%2FYAJX%2BqxjiZfP7qpOUoGHd6P5w3tzR3u%2FlmWBQEdxVZaXpTq1%2Fdo%2BEDO4jinhC2i82FlFzWUC8UZ%2Fo3DGRo%2FAy8RJSEz%2F0O3yetTjPy2o5%2BhXptxx4uJ8OWfB13VTJpRpn8yWE%3D"
+          }
+        ],
+        "group": "cf-nel",
+        "max_age": 604800
+      }',
+      nel: '{
+        "success_fraction": 0,
+        "report_to": "cf-nel",
+        "max_age": 604800
+      }',
+      server: 'cloudflare',
+      'cf-ray': '805e8005ee5d3f76-SIN',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    config: {
+      transitional: [Object
+      ],
+      adapter: [Array
+      ],
+      transformRequest: [Array
+      ],
+      transformResponse: [Array
+      ],
+      timeout: 0,
+      xsrfCookieName: 'XSRF-TOKEN',
+      xsrfHeaderName: 'X-XSRF-TOKEN',
+      maxContentLength: -1,
+      maxBodyLength: -1,
+      env: [Object
+      ],
+      validateStatus: [Function: validateStatus
+      ],
+      headers: [AxiosHeaders
+      ],
+      method: 'get',
+      url: 'https: //dusk.staging.viare.io/api/availability/store/50209484?stores=100,102,103,109',
+      data: undefined
+    },
+    request: 
+    ClientRequest {
+      _events: [Object: null prototype
+      ],
+      _eventsCount: 7,
+      _maxListeners: undefined,
+      outputData: [],
+      outputSize: 0,
+      writable: true,
+      destroyed: true,
+      _last: true,
+      chunkedEncoding: false,
+      shouldKeepAlive: false,
+      maxRequestsOnConnectionReached: false,
+      _defaultKeepAlive: true,
+      useChunkedEncodingByDefault: false,
+      sendDate: false,
+      _removedConnection: false,
+      _removedContLen: false,
+      _removedTE: false,
+      strictContentLength: false,
+      _contentLength: 0,
+      _hasBody: true,
+      _trailer: '',
+      finished: true,
+      _headerSent: true,
+      _closed: true,
+      socket: [TLSSocket
+      ],
+      _header: 'GET /api/availability/store/50209484?stores=100,
+      102,
+      103,
+      109 HTTP/1.1\r\n' +
+        'Accept: application/json, text/plain, * /*\r\n' +
+        'User-Agent: axios/1.4.0\r\n' +
+        'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+        'Host: dusk.staging.viare.io\r\n' +
+        'Connection: close\r\n' +
+        '\r\n',
+      _keepAliveTimeout: 0,
+      _onPendingData: [Function: nop],
+      agent: [Agent],
+      socketPath: undefined,
+      method: 'GET',
+      maxHeaderSize: undefined,
+      insecureHTTPParser: undefined,
+      joinDuplicateHeaders: undefined,
+      path: '/api/availability/store/50209484?stores=100,102,103,109',
+      _ended: true,
+      res: [IncomingMessage],
+      aborted: false,
+      timeoutCb: null,
+      upgradeOrConnect: false,
+      parser: null,
+      maxHeadersCount: null,
+      reusedSocket: false,
+      host: 'dusk.staging.viare.io',
+      protocol: 'https:',
+      _redirectable: [Writable],
+      [Symbol(kCapture)]: false,
+      [Symbol(kBytesWritten)]: 0,
+      [Symbol(kNeedDrain)]: false,
+      [Symbol(corked)]: 0,
+      [Symbol(kOutHeaders)]: [Object: null prototype],
+      [Symbol(errored)]: null,
+      [Symbol(kUniqueHeaders)]: null
+    },
+    data: [ [Object], [Object] ]
+  },
+  {
+    status: 200,
+    statusText: 'OK',
+    headers: AxiosHeaders {
+      date: 'Wed, 13 Sep 2023 06:58:09 GMT',
+      'content-type': 'application/json; charset=utf-8',
+      'transfer-encoding': 'chunked',
+      connection: 'close',
+      'cache-control': 'no-cache',
+      pragma: 'no-cache',
+      expires: '-1',
+      'x-frame-options': 'SAMEORIGIN',
+      'x-content-type-options': 'NOSNIFF',
+      'x-xss-protection': '1',
+      'content-security-policy': "default-src  * 'unsafe-inline' 'unsafe-eval' ; img-src * blob: data: 'unsafe-inline' ; font-src * data: 'unsafe-inline' ; media-src * blob: 'unsafe-inline' ; frame-src * data: 'unsafe-inline' 'unsafe-eval' ;",
+      'cf-cache-status': 'DYNAMIC',
+      'report-to': '{"endpoints":[{"url":"https:\\/\\/a.nel.cloudflare.com\\/report\\/v3?s=ktxAW%2Fffu3BgM4CKeM1ftMy9e98q8cl3Af0%2FSvpJsO%2Fd0VmeDJz5Beivcfz0LyHQBsDdPz7Bil4OvYZcNdZooBIQP7kpFm29n6OTVQOg2ROYgw6ZssYIi4iraUjRmCqupjod%2B%2BNAvKQ%3D"}],"group":"cf-nel","max_age":604800}',
+      nel: '{"success_fraction":0,"report_to":"cf-nel","max_age":604800}',
+      server: 'cloudflare',
+      'cf-ray': '805e8005ecd53f62-SIN',
+      'alt-svc': 'h3=":443"; ma=86400'
+    },
+    config: {
+      transitional: [Object],
+      adapter: [Array],
+      transformRequest: [Array],
+      transformResponse: [Array],
+      timeout: 0,
+      xsrfCookieName: 'XSRF-TOKEN',
+      xsrfHeaderName: 'X-XSRF-TOKEN',
+      maxContentLength: -1,
+      maxBodyLength: -1,
+      env: [Object],
+      validateStatus: [Function: validateStatus],
+      headers: [AxiosHeaders],
+      method: 'get',
+      url: 'https://dusk.staging.viare.io/api/availability/store/50210244?stores=100,102,103,109',
+      data: undefined
+    },
+    request: ClientRequest {
+      _events: [Object: null prototype],
+      _eventsCount: 7,
+      _maxListeners: undefined,
+      outputData: [],
+      outputSize: 0,
+      writable: true,
+      destroyed: true,
+      _last: true,
+      chunkedEncoding: false,
+      shouldKeepAlive: false,
+      maxRequestsOnConnectionReached: false,
+      _defaultKeepAlive: true,
+      useChunkedEncodingByDefault: false,
+      sendDate: false,
+      _removedConnection: false,
+      _removedContLen: false,
+      _removedTE: false,
+      strictContentLength: false,
+      _contentLength: 0,
+      _hasBody: true,
+      _trailer: '',
+      finished: true,
+      _headerSent: true,
+      _closed: true,
+      socket: [TLSSocket],
+      _header: 'GET /api/availability/store/50210244?stores=100,102,103,109 HTTP/1.1\r\n' +
+        'Accept: application/json, text/plain, */*\r\n' +
+        'User-Agent: axios/1.4.0\r\n' +
+        'Accept-Encoding: gzip, compress, deflate, br\r\n' +
+        'Host: dusk.staging.viare.io\r\n' +
+        'Connection: close\r\n' +
+        '\r\n',
+      _keepAliveTimeout: 0,
+      _onPendingData: [Function: nop
+      ],
+      agent: [Agent
+      ],
+      socketPath: undefined,
+      method: 'GET',
+      maxHeaderSize: undefined,
+      insecureHTTPParser: undefined,
+      joinDuplicateHeaders: undefined,
+      path: '/api/availability/store/50210244?stores=100,
+      102,
+      103,
+      109',
+      _ended: true,
+      res: [IncomingMessage
+      ],
+      aborted: false,
+      timeoutCb: null,
+      upgradeOrConnect: false,
+      parser: null,
+      maxHeadersCount: null,
+      reusedSocket: false,
+      host: 'dusk.staging.viare.io',
+      protocol: 'https:',
+      _redirectable: [Writable
+      ],
+      [Symbol(kCapture)
+      ]: false,
+      [Symbol(kBytesWritten)
+      ]: 0,
+      [Symbol(kNeedDrain)
+      ]: false,
+      [Symbol(corked)
+      ]: 0,
+      [Symbol(kOutHeaders)
+      ]: [Object: null prototype
+      ],
+      [Symbol(errored)
+      ]: null,
+      [Symbol(kUniqueHeaders)
+      ]: null
+    },
+    data: [
+      [Object
+      ],
+      [Object
+      ]
+    ]
+  }
+]
