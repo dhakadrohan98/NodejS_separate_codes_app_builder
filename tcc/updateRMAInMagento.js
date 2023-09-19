@@ -3,17 +3,24 @@ const { updateRMA, getRMADetails } = require('../magento')
 
 var params = {
     "data": {
-        "rma_id": "15",
+        "rma_id": "18",
         "status": "approved_on_item",
         "comment": [
-            "items of order are approved for return"
+            "1st comment",
+            "2nd comment"
         ],
         "items": [
             {
-                "rma_item_id": 15,
+                "rma_item_id": 18,
                 "qty_approved": 1,
                 "qty_returned": 1,
                 "status": "approved"
+            },
+            {
+                "rma_item_id": 21,
+                "qty_approved": 1,
+                "qty_returned": 1,
+                "status": "rejected"
             }
         ]
     },
@@ -38,9 +45,10 @@ async function main() {
     if (items != undefined) {
         for (var i = 0; i < items.length; i++) {
 
-            if (items[i].rma_item_id == rmaDetails.items[i].rma_entity_id) {
+            //matching rma_item_id from TCC with entity_id of items from magento.
+            if (items[i].rma_item_id == rmaDetails.items[i].entity_id) {
                 obj["entity_id"] = rmaDetails.items[i].entity_id;
-                obj["rma_entity_id"] = rmaDetails.items[i].rma_entity_id;  //From magento
+                obj["rma_entity_id"] = rmaDetails.items[i].rma_entity_id;  
                 obj["order_item_id"] = rmaDetails.items[i].order_item_id;
                 obj["qty_requested"] = rmaDetails.items[i].qty_requested;
                 obj["qty_authorized"] = rmaDetails.items[i].qty_authorized;
@@ -51,15 +59,39 @@ async function main() {
                 obj["resolution"] = rmaDetails.items[i].resolution;
                 obj["status"] = items[i].status; //From TCC
                 itemsArray.push(obj);
-                console.log("**************");
-                console.log(itemsArray);
                 console.log("(((((((((((((((((((((((");
+                console.log(itemsArray);
+                console.log(")))))))))))))))))))))))");
+                obj = {};
             }
         }
     }
 
+    //Adding comment at item level from TCC
+    var itemCommentsObject = {};
+    var itemCommentArray = [];
+    //if comment length and items length from TCC input are equal
+    if(comment.length == items.length) {
+
+        for(var i=0; i<comment.length; i++) {
+            itemCommentsObject['comment'] = comment[i]; // From Tcc
+            itemCommentsObject['rma_entity_id'] = items[i].rma_item_id;  //From TCC
+            itemCommentsObject['created_at']= rmaDetails.comments[i].created_at;
+            itemCommentsObject['entity_id'] = rmaDetails.comments[i].entity_id;
+            itemCommentsObject['customer_notified'] = rmaDetails.comments[i].customer_notified;
+            itemCommentsObject['visible_on_front'] = rmaDetails.comments[i].visible_on_front;
+            itemCommentsObject['status'] = items[i].status; //from TCC
+            itemCommentsObject['admin'] = rmaDetails.comments[i].admin;  
+            itemCommentArray.push(itemCommentsObject); 
+            console.log("**************************");
+            console.log(itemCommentArray);
+            console.log("%%%%%%%%%%%%%%%%%%%%%%");
+            itemCommentsObject = {};
+        }
+    }
+
     // if rma id is defined and rma status is approved of item, then update item status & details in magento
-    if (rma_id != undefined && rma_status == "approved_on_item") {
+    if (rma_id != undefined && rma_status != undefined) {
 
         payloadForUpdatingRMA["rmaDataObject"]["increment_id"] = rmaDetails.increment_id;
         payloadForUpdatingRMA["rmaDataObject"]["entity_id"] = rma_id; //from TCC
@@ -70,7 +102,8 @@ async function main() {
         payloadForUpdatingRMA["rmaDataObject"]['date_requested'] = rmaDetails.date_requested;
         payloadForUpdatingRMA["rmaDataObject"]['customer_custom_email'] = rmaDetails.customer_custom_email;
         payloadForUpdatingRMA["rmaDataObject"]['items'] = itemsArray; //in above logic, it is built
-        payloadForUpdatingRMA["rmaDataObject"]['status'] = rmaDetails.status;
+        payloadForUpdatingRMA["rmaDataObject"]['status'] = rma_status;
+        payloadForUpdatingRMA["rmaDataObject"]['comments'] = itemCommentArray;
     }
     else {
         payloadForUpdatingRMA["rmaDataObject"]["message"] = "can't use objects as associative array";
@@ -82,7 +115,7 @@ async function main() {
     const response = {
         statusCode: 200,
         body: {
-            "rmaDetails items": rmaDetails.items,
+            "Get rmaDetails response ": rmaDetails,
             "payloadForUpdatingRMA": payloadForUpdatingRMA,
             "result": result
         }
