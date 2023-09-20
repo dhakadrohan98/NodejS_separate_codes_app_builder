@@ -3,25 +3,32 @@ const { updateRMA, getRMADetails } = require('../magento')
 
 var params = {
     "data": {
-        "rma_id": "18",
+        "rma_id": "21",
         "status": "approved_on_item",
         "comment": [
-            "1st comment",
-            "2nd comment"
+            "1st comment for 1st item",
+            "2nd comment for 2nd item",
+            "3rd comment for 3rd item"
         ],
         "items": [
             {
-                "rma_item_id": 18,
+                "rma_item_id": 24,
                 "qty_approved": 1,
                 "qty_returned": 1,
                 "status": "approved"
             },
             {
-                "rma_item_id": 21,
-                "qty_approved": 1,
-                "qty_returned": 1,
+                "rma_item_id": 27,
+                "qty_approved": 2,
+                "qty_returned": 2,
+                "status": "approved"
+            },
+            {
+                "rma_item_id": 30,
+                "qty_approved": 0,
+                "qty_returned": 0,
                 "status": "rejected"
-            }
+            }            
         ]
     },
     "ECOMMERCE_API_URL": "https://mcstaging.dusk.au/rest/sv_dusk_au_en/V1/",
@@ -51,7 +58,8 @@ async function main() {
                 obj["rma_entity_id"] = rmaDetails.items[i].rma_entity_id;  
                 obj["order_item_id"] = rmaDetails.items[i].order_item_id;
                 obj["qty_requested"] = rmaDetails.items[i].qty_requested;
-                obj["qty_authorized"] = rmaDetails.items[i].qty_authorized;
+                //setting value of qty_authorized with the value of qty_approved.
+                obj["qty_authorized"] = items[i].qty_returned; //getting from TCC
                 obj["qty_approved"] = items[i].qty_approved; //getting from TCC
                 obj["qty_returned"] = items[i].qty_returned; //getting from TCC
                 obj["reason"] = rmaDetails.items[i].reason;
@@ -70,27 +78,29 @@ async function main() {
     //Adding comment at item level from TCC
     var itemCommentsObject = {};
     var itemCommentArray = [];
-    //if comment length and items length from TCC input are equal
-    if(comment.length == items.length) {
+    var oldItemCommentFromMagento = rmaDetails.comments;
+    //if comment length and items length from TCC input are equal and comment length of RMA(from magento) should be equal to or greater than comment length of items(from TCC).
 
         for(var i=0; i<comment.length; i++) {
             itemCommentsObject['comment'] = comment[i]; // From Tcc
-            itemCommentsObject['rma_entity_id'] = items[i].rma_item_id;  //From TCC
-            itemCommentsObject['created_at']= rmaDetails.comments[i].created_at;
-            itemCommentsObject['entity_id'] = rmaDetails.comments[i].entity_id;
-            itemCommentsObject['customer_notified'] = rmaDetails.comments[i].customer_notified;
-            itemCommentsObject['visible_on_front'] = rmaDetails.comments[i].visible_on_front;
-            itemCommentsObject['status'] = items[i].status; //from TCC
-            itemCommentsObject['admin'] = rmaDetails.comments[i].admin;  
+            itemCommentsObject['rma_entity_id'] = rma_id;  //From TCC (whole rma_id=> params.data.rma_id)
+            itemCommentsObject['created_at']= rmaDetails.date_requested; //From Magento
+            itemCommentsObject['entity_id'] = items[i].rma_item_id; //from TCC (rma_item_id) keeps on changing
+            itemCommentsObject['customer_notified'] = false; 
+            itemCommentsObject['visible_on_front'] = false;
+            itemCommentsObject['status'] = rma_status; //from TCC (header level status;)
+            itemCommentsObject['admin'] = true; //custom value  
             itemCommentArray.push(itemCommentsObject); 
             console.log("**************************");
             console.log(itemCommentArray);
             console.log("%%%%%%%%%%%%%%%%%%%%%%");
             itemCommentsObject = {};
         }
-    }
+        //concate two comment array old+new
+        var mergedCommentArray = oldItemCommentFromMagento.concat(itemCommentArray);
+        console.log("mergedCommentArray:\n"+JSON.stringify(mergedCommentArray));
 
-    // if rma id is defined and rma status is approved of item, then update item status & details in magento
+    // if rma id is defined and rma status is approved_of_item, then update item status & details in magento
     if (rma_id != undefined && rma_status != undefined) {
 
         payloadForUpdatingRMA["rmaDataObject"]["increment_id"] = rmaDetails.increment_id;
@@ -103,7 +113,7 @@ async function main() {
         payloadForUpdatingRMA["rmaDataObject"]['customer_custom_email'] = rmaDetails.customer_custom_email;
         payloadForUpdatingRMA["rmaDataObject"]['items'] = itemsArray; //in above logic, it is built
         payloadForUpdatingRMA["rmaDataObject"]['status'] = rma_status;
-        payloadForUpdatingRMA["rmaDataObject"]['comments'] = itemCommentArray;
+        payloadForUpdatingRMA["rmaDataObject"]['comments'] = mergedCommentArray; //from Magento and TCC
     }
     else {
         payloadForUpdatingRMA["rmaDataObject"]["message"] = "can't use objects as associative array";
@@ -122,16 +132,15 @@ async function main() {
     }
     console.log("\n")
     console.log(JSON.stringify(response))
-    // return response
+   
+    // const response = {
+    //     statusCode: 200,
+    //     body: {"rmaDetails items":rmaDetails.items}
+    //   }
+    //   return response
 }
 
 main();
-
-
-
-
-
-
 
 // "rmaDataObject":{
 //         "increment_id": rmaDetails.increment_id,
