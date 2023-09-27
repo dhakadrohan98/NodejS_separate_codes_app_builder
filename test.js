@@ -11,3 +11,15 @@ var itemArray = [];
 itemArray.push({"key1":"val1"});
 itemArray.push({"key2":"val2"});
 console.log(itemArray);
+
+var num = "2043-09-06";
+// Convert it to a string
+var dateString = num.toString();
+// Extract year, month, and day parts
+var year = dateString.substring(0, 4);
+var month = dateString.substring(5, 7);
+var day = dateString.substring(8, 10);
+// Create the formatted date string
+var cardExpDate = month + '-' + day + '-' + year;
+
+console.log(cardExpDate)
