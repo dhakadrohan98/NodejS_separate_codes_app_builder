@@ -57,23 +57,28 @@ async function updateRMA(params,payload,rma_id){
 }
 
 async function UpdateCustomerInMagento(params,payload,id){
-    if(typeof payload.customer.custom_attributes != "undefined" && payload.customer.custom_attributes.length > 0){
-        for (var i = 0; i < payload.customer.custom_attributes.length; i++) {
+    if(typeof payload.customer.custom_attributes != "undefined" && payload.customer.custom_attributes.length > 0)
+    {
+        for (var i = 0; i < payload.customer.custom_attributes.length; i++) 
+        {
+            // Checking if custom attribute of customer has expiry date or not
             if(payload.customer.custom_attributes[i].attribute_code == "rewards_expiry_date")
             {
-               expirydateinpayload = payload.customer.custom_attributes[i].value
-               if(payload.customer.group_id != params.ECOMMERCE_CUSTOMER_LOYALTY_GROUP_ID){
+                expirydateinpayload = payload.customer.custom_attributes[i].value
                 var currentAusDate = new Date().toLocaleDateString("en-US", {timeZone: "Australia/Sydney"});
                 var currentAusDateIso = new Date(currentAusDate);
                 var expirydateIso = new Date(expirydateinpayload);
-                if( params.data.value.card_no != undefined && params.data.value.card_no != '' ){
-                    if(currentAusDateIso.getTime() < expirydateIso.getTime()){
-                        payload.customer.group_id = params.ECOMMERCE_CUSTOMER_LOYALTY_GROUP_ID;
-                    }else{
-                        payload.customer.group_id = params.ECOMMERCE_CUSTOMER_GENERAL_GROUP_ID;
-                    }
+               //Checking if customer is not already in loyalty customer group and non-expired loyalty membership
+               if(payload.customer.group_id != params.ECOMMERCE_CUSTOMER_LOYALTY_GROUP_ID && currentAusDateIso.getTime() < expirydateIso.getTime()){
+                    for (var j = 0; j < payload.customer.custom_attributes.length; j++) {
+                        // checking if custom attribute of customer is having givex number or not
+                        if(payload.customer.custom_attributes[j].attribute_code == "givex_number"){
+                            payload.customer.group_id = params.ECOMMERCE_CUSTOMER_LOYALTY_GROUP_ID;
+                        }
+                    }    
+                }else if(payload.customer.group_id != params.ECOMMERCE_CUSTOMER_GENERAL_GROUP_ID && currentAusDateIso.getTime() > expirydateIso.getTime()){
+                    payload.customer.group_id = params.ECOMMERCE_CUSTOMER_GENERAL_GROUP_ID;
                 }
-            }
             }
         }
     }
