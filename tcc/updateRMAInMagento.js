@@ -3,32 +3,24 @@ const { updateRMA, getRMADetails } = require('../magento')
 
 var params = {
     "data": {
-        "rma_id": "21",
+        "rma_id": "30",
         "status": "approved_on_item",
         "comment": [
-            "1st comment for 1st item",
-            "2nd comment for 2nd item",
-            "3rd comment for 3rd item"
+            "wait for next 24 hrs for returns to be approved"
         ],
         "items": [
             {
-                "rma_item_id": 24,
+                "rma_item_id": 42,
                 "qty_approved": 1,
                 "qty_returned": 1,
                 "status": "approved"
             },
             {
-                "rma_item_id": 27,
-                "qty_approved": 2,
-                "qty_returned": 2,
-                "status": "approved"
-            },
-            {
-                "rma_item_id": 30,
+                "rma_item_id": 45,
                 "qty_approved": 0,
                 "qty_returned": 0,
                 "status": "rejected"
-            }            
+            }          
         ]
     },
     "ECOMMERCE_API_URL": "https://mcstaging.dusk.au/rest/sv_dusk_au_en/V1/",
@@ -50,21 +42,22 @@ async function main() {
 
     //updating items array & it will be used while prepairing payload of updating RMA.
     if (items != undefined) {
-        for (var i = 0; i < items.length; i++) {
-
+        for (i = 0; i < items.length; i++) {
+            //iterating through RMA items of magento (same RMA_ID)
+            for(j=0; j<rmaDetails.items.length; j++) {
             //matching rma_item_id from TCC with entity_id of items from magento.
-            if (items[i].rma_item_id == rmaDetails.items[i].entity_id) {
-                obj["entity_id"] = rmaDetails.items[i].entity_id;
-                obj["rma_entity_id"] = rmaDetails.items[i].rma_entity_id;  
-                obj["order_item_id"] = rmaDetails.items[i].order_item_id;
-                obj["qty_requested"] = rmaDetails.items[i].qty_requested;
+            if (items[i].rma_item_id == rmaDetails.items[j].entity_id) {
+                obj["entity_id"] = rmaDetails.items[j].entity_id;
+                obj["rma_entity_id"] = rmaDetails.items[j].rma_entity_id;  
+                obj["order_item_id"] = rmaDetails.items[j].order_item_id;
+                obj["qty_requested"] = rmaDetails.items[j].qty_requested;
                 //setting value of qty_authorized with the value of qty_approved.
                 obj["qty_authorized"] = items[i].qty_returned; //getting from TCC
                 obj["qty_approved"] = items[i].qty_approved; //getting from TCC
                 obj["qty_returned"] = items[i].qty_returned; //getting from TCC
-                obj["reason"] = rmaDetails.items[i].reason;
-                obj["condition"] = rmaDetails.items[i].condition;
-                obj["resolution"] = rmaDetails.items[i].resolution;
+                obj["reason"] = rmaDetails.items[j].reason;
+                obj["condition"] = rmaDetails.items[j].condition;
+                obj["resolution"] = rmaDetails.items[j].resolution;
                 obj["status"] = items[i].status; //From TCC
                 itemsArray.push(obj);
                 console.log("(((((((((((((((((((((((");
@@ -72,6 +65,7 @@ async function main() {
                 console.log(")))))))))))))))))))))))");
                 obj = {};
             }
+          }
         }
     }
 

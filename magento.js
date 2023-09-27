@@ -56,7 +56,77 @@ async function updateRMA(params,payload,rma_id){
     }
 }
 
+async function UpdateCustomerInMagento(params,payload,id){
+    if(typeof payload.customer.custom_attributes != "undefined" && payload.customer.custom_attributes.length > 0){
+        for (var i = 0; i < payload.customer.custom_attributes.length; i++) {
+            if(payload.customer.custom_attributes[i].attribute_code == "rewards_expiry_date")
+            {
+               expirydateinpayload = payload.customer.custom_attributes[i].value
+               if(payload.customer.group_id != params.ECOMMERCE_CUSTOMER_LOYALTY_GROUP_ID){
+                var currentAusDate = new Date().toLocaleDateString("en-US", {timeZone: "Australia/Sydney"});
+                var currentAusDateIso = new Date(currentAusDate);
+                var expirydateIso = new Date(expirydateinpayload);
+                if( params.data.value.card_no != undefined && params.data.value.card_no != '' ){
+                    if(currentAusDateIso.getTime() < expirydateIso.getTime()){
+                        payload.customer.group_id = params.ECOMMERCE_CUSTOMER_LOYALTY_GROUP_ID;
+                    }else{
+                        payload.customer.group_id = params.ECOMMERCE_CUSTOMER_GENERAL_GROUP_ID;
+                    }
+                }
+            }
+            }
+        }
+    }
+    
+    var url = params.ECOMMERCE_API_URL+params.ECOMMERCE_CUSTOMER_ENDPOINT+'/'+id; //params.data.value.entity_id-/18
+    var config = {
+      method: 'put',
+      url: url.replace(/\\\//g, "/"),
+      headers: { 
+        'Authorization': 'Bearer '+params.ECOMMERCE_AUTHORIZED_TOKEN, 
+        'Content-Type': 'application/json'
+      },
+      data : JSON.stringify(payload)
+    };
+
+    try{
+        var response = await axios(config);
+
+        if(response.status == 200){
+            return response.data;
+        }
+    }catch(error){
+        return error;
+    }
+}
+
+async function getCustomerByEmail(params, email){
+
+    var urlparams = "search?searchCriteria[filterGroups][0][filters][0][field]=email&searchCriteria[filterGroups][0][filters][0][value]="+encodeURIComponent(email)+"&searchCriteria[filterGroups][0][filters][0][condition_type]=eq"
+    var url = params.ECOMMERCE_API_URL+params.ECOMMERCE_CUSTOMER_ENDPOINT+'/'+urlparams; //params.data.value.entity_id-/18
+    
+    var config = {
+      method: 'get',
+      url: url.replace(/\\\//g, "/"), 
+      headers: { 
+        'Authorization': 'Bearer '+params.ECOMMERCE_AUTHORIZED_TOKEN,
+      }
+    };
+
+    try{
+        var response = await axios(config);
+
+        if(response.status == 200){
+            return response.data;
+        }
+    }catch(error){
+        return error;
+    }
+}
+
 module.exports = {
     updateRMA,
-    getRMADetails
+    getRMADetails,
+    UpdateCustomerInMagento,
+    getCustomerByEmail
   }

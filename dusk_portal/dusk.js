@@ -1,5 +1,6 @@
 const {getCustomerDataById} = require("../futura.js")
 const {duskportalCustomerPayload, SendCustomerData} = require("../duskportal.js")
+const {UpdateCustomerInMagento, getCustomerByEmail} = require("../magento.js")
 var params = {
     "ECOMMERCE_API_URL":"https://mcstaging.dusk.au/rest/sv_dusk_au_en/V1/",
     "ECOMMERCE_RETURNS_ENDPOINT": "returns",
@@ -25,7 +26,8 @@ var params = {
             "futuraId":"704732351",
         }
     },
-    "customerID":"9"
+    "customerID":"9",
+    "Email":"rohan.dhakad+4@sigmainfo.net"
 
 };
 
@@ -212,8 +214,17 @@ async function main(){
     // console.log(updatecustomer);
     // console.log("\n");
     // var duskpayload = await duskportalCustomerPayload(params, updatecustomer,params.customerID)
-    var duskcustomercreate = await SendCustomerData(params, duskpayload);
-    console.log(duskcustomercreate);
+    // var duskcustomercreate = await SendCustomerData(params, duskpayload);
+    // console.log(duskcustomercreate);
+
+    // var email = params.Email;
+    // var customerData = await getCustomerByEmail(params, email);
+    // console.log(JSON.stringify(customerData));
+    // var data = await UpdateCustomerInMagento(params,{"customer":magecustomer},id);
+    // console.log(data);
+
+    var updatecustomer = await getCustomerDataById(params,duskpayload.Futura_Number);
+    console.log(updatecustomer);
 }
 
 main();
