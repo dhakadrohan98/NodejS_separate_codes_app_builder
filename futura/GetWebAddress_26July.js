@@ -13,7 +13,7 @@ var headers = {
 var payload = {
     Value: {
             web_ans_typ: 3,
-            web_ans_nummer: 704856598, //704856534,704856432
+            web_ans_nummer: 20003282, //704856534,704856432 //704856433 //704856598
             web_ans_count: 1,
             web_ans_name1: '',
             web_ans_name2: '',
@@ -56,7 +56,6 @@ var payload = {
   client.addHttpHeader('CF-Access-Client-Secret', 'ff6e0612ff3cc2962cd1dbad55a55cf72f5d3d5f3678fdd0f3aece5f0586c048');
 
   client.get_web_address(payload, function(err, result) {
-         console.log(result);
          console.log(JSON.stringify(result))
       });
   });
