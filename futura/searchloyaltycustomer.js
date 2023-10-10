@@ -1,187 +1,171 @@
-const soap = require('soap')
-const axios = require('axios')
-const url = "https://futura-staging-adr.dusk.com.au/SOAP?service=FuturERS_ADR";
+/*
+* <license header>
+*/
 
-var params = {
-    "email":"rohan.dhakad@sigmainfo.net"
-}
-
-var headers = {
-    'trace': 1, 
-        'exceptions': true,
-        'connection_timeout': 30,
-        'CF-Access-Client-Id': '30979c34f222ca7ac7ac3d24120060a5.access',
-        'CF-Access-Client-Secret': 'ff6e0612ff3cc2962cd1dbad55a55cf72f5d3d5f3678fdd0f3aece5f0586c048'
-}
-
-//Search in Futura
-async function searchCustomerInFutura(email, headers) {
-
-var apiEndpoint = 'https://futura-staging-adr.dusk.com.au/SOAP?service=FuturERS_ADR';
-
-var payload = {"web_search_kde":{"web_fld_names":{"string":["ADD_NUMMER","ANS_EMAIL","ADD_TYP"]},"web_flds_fill":{"string":["",email,"3"]},"web_error":{"web_err_nr":0,"web_err_txt":""}}}	
-
-return new Promise((resolve, reject) => {
-soap.createClient(apiEndpoint, {wsdl_headers: headers}, function(err, client) {
+/**
+ * This is a sample action showcasing how to access an external API
+ *
+ * Note:
+ * You might want to disable authentication and authorization checks against Adobe Identity Management System for a generic action. In that case:
+ *   - Remove the require-adobe-auth annotation for this action in the manifest.yml of your application
+ *   - Remove the Authorization header from the array passed in checkMissingRequestInputs
+ *   - The two steps above imply that every client knowing the URL to this deployed action will be able to invoke it without any authentication and authorization checks against Adobe Identity Management System
+ *   - Make sure to validate these changes against your security requirements before deploying the action
+ */
 
 
-  client.setEndpoint('https://futura-staging-adr.dusk.com.au/SOAP?service=FuturERS_ADR');
-  client.addHttpHeader('CF-Access-Client-Id', '30979c34f222ca7ac7ac3d24120060a5.access'); 
-  client.addHttpHeader('CF-Access-Client-Secret', 'ff6e0612ff3cc2962cd1dbad55a55cf72f5d3d5f3678fdd0f3aece5f0586c048');
+const fetch = require('node-fetch')
+const { Core } = require('@adobe/aio-sdk')
+const { errorResponse, getBearerToken, stringParameters, checkMissingRequestInputs } = require('../utils')
+const { SearchInFutura, getCommonById, payloadForSearch } = require('../futura')
 
-    client.web_search_customer(payload, function(err, result) { 
-       resolve(result)
-    });
-  });
-})
-}
+// main function that will be executed by Adobe I/O Runtime
+async function main (params) {
 
-async function getWebCommon(futuraId){
-   
-    var payload = {
-        Value: {
-            web_add_typ: 3,
-            web_add_nummer: futuraId,
-            web_add_index: '',
-            web_add_zahlart: 0,
-            web_add_zahlinttyp: 0,
-            web_add_zahlintcount: 0,
-            web_add_last_rg_datum: '1899-12-30T00:00:00',
-            web_add_last_pay_datum: '1899-12-30T00:00:00',
-            web_add_kundennummer: '',
-            web_add_bankname: '',
-            web_add_bankleitzahl: '',
-            web_add_bankkonto: '',
-            web_add_bic: '',
-            web_add_iban: '',
-            web_add_kreditkarte: '',
-            web_add_sperrdatum: '1899-12-30T00:00:00',
-            web_add_sperrgrund: '',
-            web_add_last_sammelrg_datum: '1899-12-30T00:00:00',
-            web_add_manumahnung: 0,
-            web_add_status: 0,
-            web_add_loesch_datum: '1899-12-30T00:00:00',
-            web_add_inactive: 0,
-            web_add_bildname: '',
-            web_add_zahlziel: 0,
-            web_add_gutschrift: 0,
-            web_add_sprache: '',
-            web_add_fibuexport_first: '1899-12-30T00:00:00',
-            web_add_fibuexport_last: '1899-12-30T00:00:00',
-            web_add_vfw_bereich: 0,
-            web_add_rg_druckrabatt: 0,
-            web_add_rg_druckformat: 0,
-            web_add_info_nodisplay: 0,
-            web_add_externid: '',
-            web_add_geschlecht: 0,
-            web_add_werbung: 0,
-            web_add_master_typ: 0,
-            web_add_master_nummer: 0,
-            web_add_karte_erfasst: '1899-12-30T00:00:00',
-            web_add_karte_ausgegeben: '1899-12-30T00:00:00',
-            web_add_ohne_bonus: 0,
-            web_add_wf_status: 0,
-            web_add_wf_flags: 0,
-            web_add_wf_id: 0,
-            web_add_wf_date_time_1: '1899-12-30T00:00:00',
-            web_add_wf_date_time_2: '1899-12-30T00:00:00',
-            web_add_wf_date_time_3: '1899-12-30T00:00:00',
-            web_add_import_datum: '1899-12-30T00:00:00',
-            web_add_export_datum: '1899-12-30T00:00:00',
-            web_add_datum_user: '1899-12-30T00:00:00',
-            web_add_obild: '',
-            web_add_obild_ext: '',
-            web_add_clog_user: 0,
-            web_add_clog_date_time: '1899-12-30T00:00:00',
-            web_add_ulog_user: 0,
-            web_add_ulog_date_time: '1899-12-30T00:00:00',
-            web_error: {
-                web_err_nr: 0,
-                web_err_txt: '',
-            }
-        },
-        'web_user': '',
-        'web_Pass': '',
+  // create a Logger
+  const logger = Core.Logger('main', { level: params.LOG_LEVEL || 'info' })
+
+  try {
+    var paramsRequest;
+    let responseData = {};
+    //while retrying we get data in params.data.params
+    if (params.data != undefined && params.data.value != undefined &&  params.data.value.params != undefined) {
+      paramsRequest = params.data.value.params;
+      // //If receiving parent_id from retrying then store it in responseData['id']. 
+      // if(typeof params.data.value.api_id !== "undefined") {
+      //     responseData["api_id"] = params.data.value.api_id;
+      // }
+  }
+  else {
+      paramsRequest = params;
+  }
+        responseData["event_code"] = params.type;
+        responseData["provider_id"] = params.source;
+        responseData["event_id"] = params.event_id;
+        responseData["entity"] = "Customer";
+        responseData["from"] = "Futura";
+        responseData["reference_id"] = paramsRequest.email;
+        responseData['params'] = paramsRequest;
+    // 'info' is the default level if not set
+    logger.info('Calling the main action')
+
+    // log parameters, only if params.LOG_LEVEL === 'debug'
+    logger.debug(stringParameters(params))
+
+    try{
+    // check for missing request input parameters and headers
+    const requiredParams = []
+    const requiredHeaders = ['Authorization']
+    const errorMessage = checkMissingRequestInputs(params, requiredParams, requiredHeaders)
+    if (errorMessage) {
+      // return and log client errors
+      return errorResponse(400, errorMessage, logger)
     }
+
+    if(!paramsRequest.email && !paramsRequest.futura_id){
+        // don't have require param
+        return errorResponse(400, "email or futura_id is required parameter", logger) 
+    }
+
+    var futuraId = "", futuracustomer={}
+    var lolaltyCardNo = "", futuracustomerdata={};
+    var loyaltyExpiryDetails= "";
+    var searchPaylod;
+    var timeouterror = false;
+    var getwebcommondata = {}, getWebCommonResult;
+
+    if (typeof paramsRequest.futura_get_customer_detail == "undefined" || paramsRequest.futura_get_customer_detail.status == false) {
+      try{
+          futuracustomerdata['integration'] = "Futura";
+          futuracustomerdata['action'] = "Get Customer Futura";
+          // check payload customer based on email or futura id
+          if(paramsRequest.email){
+            searchPaylod =  await payloadForSearch(paramsRequest.email);
+            futuracustomerdata['request'] = searchPaylod;
+            futuracustomer = await SearchInFutura(params,searchPaylod, paramsRequest.email);  
+          }else{
+              futuracustomerdata['request'] = paramsRequest.email;
+              futuracustomer = [paramsRequest.futura_id] 
+          }
+          futuracustomerdata['status'] = true;
+          futuracustomerdata['response'] = futuracustomer;
+          //Now calling getCommonById method if Futura_Id of customer is found 
+          if (typeof paramsRequest.get_common_customer_futura == "undefined" || paramsRequest.get_common_customer_futura.status == false) {
+            try{
+              if(futuracustomer.length > 0){
+                getwebcommondata['integration'] = "Futura";
+                getwebcommondata['action'] = "Get Common Data Futura";
+                futuraId = futuracustomer[0]
+                getwebcommondata['request'] = futuraId;
+                // get common detail of customer from Futura
+                getWebCommonResult = await getCommonById(params, futuraId);
+                var lolaltyCardNo = getWebCommonResult.web_add_kreditkarte;
+                var loyaltyExpiryDetails = getWebCommonResult.web_add_sperrdatum;
+                let newdate = new Date(loyaltyExpiryDetails)
+                let exp = String(newdate.getFullYear());
+                if(exp == "1899"){
+                  loyaltyExpiryDetails = "";
+                }
+                getwebcommondata['status'] = true;
+                getwebcommondata['response'] =  getWebCommonResult;
+              }
+            } catch(error){
+              if (error.code == "ECONNABORTED") {
+                timeouterror = true
+              }
+              getwebcommondata['status'] = false
+              getwebcommondata['response'] = error
+           }
+          } else if (typeof paramsRequest.get_common_customer_futura != "undefined" && paramsRequest.get_common_customer_futura.status == true) {
+            getWebCommonResult = paramsRequest.get_common_customer_futura.response;
+            getwebcommondata = paramsRequest.get_common_customer_futura;
+
+          }
+          responseData['get_common_customer_futura'] = getwebcommondata;
+        } catch (error) {
+          if (error.code == "ECONNABORTED") {
+              timeouterror = true
+          }
+          futuracustomerdata['status'] = false
+          futuracustomerdata['response'] = error
+        } 
+      } else if (typeof paramsRequest.futura_get_customer_detail != "undefined" && paramsRequest.futura_get_customer_detail.status == true) {
+        futuracustomer = paramsRequest.futura_get_customer_detail.response;
+        futuracustomerdata = paramsRequest.futura_get_customer_detail;
+    }
+    responseData['futura_get_customer_detail'] = futuracustomerdata;
+
+
+  } catch (error) {
+    if (typeof responseData['get_common_customer_futura']['status'] == "undefined") {
+        responseData['get_common_customer_futura']['status'] = false;
+    }
+    if (id && typeof responseData['futura_get_customer_detail']['status'] == "undefined") {
+        responseData['futura_get_customer_detail']['status'] = false;
+    }
+  }
     
-    return new Promise((resolve, reject) => {
-      soap.createClient(url, {wsdl_headers: headers}, function(err, client) {
-      
-    
-      client.setEndpoint('https://futura-staging-adr.dusk.com.au/SOAP?service=FuturERS_ADR')
-      client.addHttpHeader('CF-Access-Client-Id', '30979c34f222ca7ac7ac3d24120060a5.access'); 
-      client.addHttpHeader('CF-Access-Client-Secret', 'ff6e0612ff3cc2962cd1dbad55a55cf72f5d3d5f3678fdd0f3aece5f0586c048');
-    
-      client.get_web_common(payload, function(err, result) {
-                resolve(result);
-          });
-      });
-    })
+    var content = {
+      "futura_id": futuraId,
+      "Loyalty_card_no": lolaltyCardNo,
+      "exp_date": loyaltyExpiryDetails,
+      "responseData":responseData
+    }
+
+    const response = {
+      statusCode: 200,
+      body: content
+
+    }
+    // log the response status code
+    logger.info(`${response.statusCode}: successful request`)
+    return response
+  } catch (error) {
+    // log any server errors
+    logger.error(error)
+    // return with 500
+    return errorResponse(500, error, logger)
+  }
 }
 
-async function main() {
-    var futuraId = null;
-    var searchcustomerdata = await searchCustomerInFutura(params.email, headers);
-
-    console.log("search customer in Futura: "+ JSON.stringify(searchcustomerdata))
-      var arrayLength = searchcustomerdata.web_search_customerResult.Tweb_search_kde_fld.length;
-      let i = 0;
-      var flag = false;
-
-      while (i < arrayLength && flag != true) {
-        var email = searchcustomerdata.web_search_customerResult.Tweb_search_kde_fld[i].web_flds.string[1];
-        if(!(email.localeCompare("rohan.dhakad@sigmainfo.net"))) {
-          futuraId = searchcustomerdata.web_search_customerResult.Tweb_search_kde_fld[i].web_flds.string[0];
-          console.log("FuturaId: "+futuraId);
-          flag = true;
-        }
-        i++;
-      }
-
-      if(flag) {
-        var getWebCommonResult = await getWebCommon(futuraId, headers);
-        var lolaltyCardNo = getWebCommonResult.web_add_kreditkarte;
-        var loyaltyExpiryDetails = getWebCommonResult.web_add_sperrdatum;
-
-        if(lolaltyCardNo == undefined) {
-            lolaltyCardNo = "";
-        }
-        if(loyaltyExpiryDetails == undefined) {
-            loyaltyExpiryDetails = "";
-        }
-
-        var finalResponse = {
-            "futura_id": futuraId,
-            "loyalty_card_no": lolaltyCardNo,
-            "exp_date":loyaltyExpiryDetails
-        }
-
-        console.log(finalResponse);
-      }
-      else {
-        console.log("%%%%%%%%%%%%%%%%%%%%%%")
-        console.log("Customer not found")
-      }
-
-
-
-    // console.log(JSON.stringify(seachCustomerResponse));
-
-    // var seachCustomerResponse1 = seachCustomerResponse.web_search_customerResult.Tweb_search_kde_fld;
-    // console.log("\n");
-    // console.log(seachCustomerResponse1[0].web_flds.string[0]);
-    // console.log("************************************");
-
-    // if(seachCustomerResponse1[0].web_error.web_err_nr == 0) {
-    //     var length =  seachCustomerResponse1[0].web_flds.length;
-
-    //     for(i=0; i<length; i++) {
-    //             if(params.email == seachCustomerResponse1[0].web_flds.string[i]) {
-    //                 futuraId = seachCustomerResponse1[0].web_flds[i].string[0];
-    //             }    
-    //     }
-    // }
-    // console.log("\n");
-    // console.log("FuturaId: "+futuraId);
-}
-main();
+exports.main = main
