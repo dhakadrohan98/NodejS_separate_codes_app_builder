@@ -66,6 +66,7 @@ var givexBoolean=false, expDateBoolean=false; //flag
     var lastName= params.data.Last_name;
 
 async function main(){
+    //it is just starting code.
     var customerData = await getCustomerByEmail(params, params.data.email);
     // console.log(JSON.stringify(customerData));
     // Updating/Adding custom attributes(if not present)
@@ -116,3 +117,15 @@ async function main(){
     }
 }
 main();
+
+// if(customerData.total_count == 1){ //customer found in magento
+
+//     //updating firstname, lastname and DOB
+//     customerData.items[0].firstname = firstName;
+//     customerData.items[0].lastname = lastName;
+//     customerData.items[0].dob = date_of_birth;
+
+//     var magecustomer = customerData.items[0];  //storing magento details to a variable
+//     var magentoId = customerData.items[0].id; //taking magento id
+//     var customAttrlen =  magecustomer.custom_attributes.length; //length of custom Attributes of customer(magento)
+//     let i=0;
