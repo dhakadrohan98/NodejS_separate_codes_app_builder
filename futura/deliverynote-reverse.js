@@ -25,6 +25,8 @@ const { sendcloudevent} = require('../token')
 async function main (params) {
   // create a Logger
   const logger = Core.Logger('main', { level: params.LOG_LEVEL || 'info' })
+  
+  var is_reverse = false;
 
   try {
 
@@ -88,7 +90,7 @@ async function main (params) {
               magentoorderdata['action'] = "Order Data";
               magentoorderdata['request'] = paramsRequest.order_id;
               // get Magento order info
-              orderinfo = await getOrderInfo(params, params.data.value.order_id)
+              orderinfo = await getOrderInfo(params, paramsRequest.order_id)
               magentoorderdata["status"] = true;
               magentoorderdata["response"] = orderinfo;
             } catch (error) {
@@ -96,7 +98,7 @@ async function main (params) {
                 timeouterror = true
             }
             magentoorderdata['status'] = false
-            magentoorderdata['response'] = error
+            magentoorderdata['response'] = error.message
           }
         } else if (typeof paramsRequest.get_order_info_magento != "undefined" && paramsRequest.get_order_info_magento.status == true) {
           orderinfo = paramsRequest.get_order_info_magento.response;
@@ -124,7 +126,7 @@ async function main (params) {
                   timeouterror = true
               }
               shipmentdata['status'] = false
-              shipmentdata['response'] = error
+              shipmentdata['response'] = error.message
             }
         } else if (typeof paramsRequest.get_shipment_info_magento != "undefined" && paramsRequest.get_shipment_info_magento.status == true) {
             shipment_data = paramsRequest.get_shipment_info_magento.response;
@@ -300,7 +302,7 @@ async function main (params) {
                         timeouterror = true
                     }
                     deliverynoteparamdata['status'] = false
-                    deliverynoteparamdata['response'] = error
+                    deliverynoteparamdata['response'] = error.message
                 }
               } else if (typeof paramsRequest.create_delivery_note_payload_futura != "undefined" && paramsRequest.create_delivery_note_payload_futura.status == true) {
                     deliverynoteparam = paramsRequest.create_delivery_note_payload_futura.response;
@@ -358,7 +360,7 @@ async function main (params) {
                           timeouterror = true
                       }
                       postaldeliveryapidata['status'] = false
-                      postaldeliveryapidata['response'] = error
+                      postaldeliveryapidata['response'] = error.message
                   }
               } else if (typeof paramsRequest.create_delivery_note_payload_postalcharge_futura != "undefined" && paramsRequest.create_delivery_note_payload_postalcharge_futura.status == true) {
                 postalcharge_params = paramsRequest.create_delivery_note_payload_postalcharge_futura.response;
@@ -469,7 +471,7 @@ async function main (params) {
                             timeouterror = true
                         }
                         adjustmentchargeparamsdata['status'] = false
-                        adjustmentchargeparamsdata['response'] = error
+                        adjustmentchargeparamsdata['response'] = error.message
                       }
                     } else if (typeof paramsRequest.create_delivery_note_payload_adjustmentcharge_futura != "undefined" && paramsRequest.create_delivery_note_payload_adjustmentcharge_futura.status == true) {
                         adjustmentcharge_params = paramsRequest.create_delivery_note_payload_adjustmentcharge_futura.response;
@@ -507,7 +509,7 @@ async function main (params) {
                       timeouterror = true
                   }
                   adjustmentdeliveryapidata['status'] = false
-                  adjustmentdeliveryapidata['response'] = error
+                  adjustmentdeliveryapidata['response'] = error.message
                 }
               } else if (typeof paramsRequest.create_delivery_note_adjustmentcharge_futura != "undefined" && paramsRequest.create_delivery_note_adjustmentcharge_futura.status == true) {
                   create_adjustmentcharge_note = paramsRequest.create_delivery_note_adjustmentcharge_futura.response;
