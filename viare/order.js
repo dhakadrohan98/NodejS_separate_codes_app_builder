@@ -42,7 +42,7 @@ async function main(params) {
         var paramsRequest;
         var responseData = {};
             //while retrying we get data in params.data.params
-            if (typeof params.data.value.params !== "undefined") {
+            if (typeof params.data.value !== "undefined" && typeof params.data.value.params !== "undefined") {
                 paramsRequest = params.data.value.params;
                 // //If receiving parent_id from retrying then store it in responseData['id']. 
                 // if(typeof params.data.value.api_id !== "undefined") {
@@ -391,10 +391,10 @@ async function main(params) {
                         } catch (error) {
                             if (error.code == "ECONNABORTED") {
                                 timeouterror = true
+                            }
+                            isorderavailableonfuturadata['status'] = false
+                            isorderavailableonfuturadata['response'] = error
                     }
-                    isorderavailableonfuturadata['status'] = false
-                    isorderavailableonfuturadata['response'] = error
-                }
                 } else if (typeof paramsRequest.is_order_exist_futura != "undefined" && paramsRequest.is_order_exist_futura.status == true) {
                     isOrderAvailableOnFutura = paramsRequest.is_order_exist_futura.response;
                     isorderavailableonfuturadata = paramsRequest.is_order_exist_futura;
@@ -407,13 +407,35 @@ async function main(params) {
                     // Create order on GIVEX if the loyaltynumber is available
                     if((paramsRequest.order) && (paramsRequest.givexnumber))
                     {
-                        var loyaltypoints_payload = {"value": {"givexnumber": ""+paramsRequest.givexnumber, "order": paramsRequest.order}}
-                        var loyaltypointsresponse = await sendcloudevent(
-                            params,
-                            params.GIVEX_LOYALTYPOINTS_PROVIDER_ID,
-                            params.GIVEX_LOYALTYPOINTS_EVENTCODE,
-                            loyaltypoints_payload
-                        );
+                        var createordergivexdata = {}, loyaltypointsresponse;
+                        var loyaltypoints_payload;
+                        if (typeof paramsRequest.create_order_givex_sendcloudevent == "undefined" || paramsRequest.create_order_givex_sendcloudevent.status == false) {
+                            try {
+                                //Rerying condition -6
+                                createordergivexdata['integration'] = "Givex";
+                                createordergivexdata['action'] = "Create Order"
+                                loyaltypoints_payload = {"value": {"givexnumber": ""+paramsRequest.givexnumber, "order": paramsRequest.order}}
+                                createordergivexdata['request'] = loyaltypoints_payload;
+                                loyaltypointsresponse = await sendcloudevent(
+                                params,
+                                params.GIVEX_LOYALTYPOINTS_PROVIDER_ID,
+                                params.GIVEX_LOYALTYPOINTS_EVENTCODE,
+                                loyaltypoints_payload
+                                );
+                                createordergivexdata['status'] = true;
+                                createordergivexdata['response'] = loyaltypointsresponse;
+                            } catch (error) {
+                                if (error.code == "ECONNABORTED") {
+                                    timeouterror = true
+                                }
+                                createordergivexdata['status'] = false
+                                createordergivexdata['response'] = error
+                            }
+                        } else if (typeof paramsRequest.create_order_givex_sendcloudevent != "undefined" && paramsRequest.create_order_givex_sendcloudevent.status == true) {
+                            loyaltypointsresponse = paramsRequest.create_order_givex_sendcloudevent.response;
+                            createordergivexdata = paramsRequest.create_order_givex_sendcloudevent;
+                        }
+                        responseData['create_order_givex_sendcloudevent'] = createordergivexdata;                        
                     }
 
                     // if gift card product is there execute giftcard purchase event
@@ -426,48 +448,124 @@ async function main(params) {
                             (responseData.futura_order.status) && 
                             (responseData.futura_order.status == true) 
                         ) {
-                            // Event Call | It will not create any giftcard if the order is not having any giftcard type item
-                            var gitcardResponse = await sendcloudevent(
-                                params,
-                                params.GIVEX_GIFTCARD_CREATE_PROVIDER_ID,
-                                params.GIVEX_GIFTCARD_CREATE_EVENTCODE,
-                                giftcardPayload
-                            );
+                            var giftcardpurchasedata = {};
+                            var gitcardResponse;
+                            //Retrying condition -7 
+                            if (typeof paramsRequest.create_gift_card_sendcloudevent == "undefined" || paramsRequest.create_gift_card_sendcloudevent.status == false) {
+                                try {
+                                    giftcardpurchasedata['integration'] = "Givex";
+                                    giftcardpurchasedata['action'] = "Create Gift Card";
+                                    giftcardpurchasedata['request'] = giftcardPayload;
+                                    // Event Call | It will not create any giftcard if the order is not having any giftcard type item
+                                    gitcardResponse = await sendcloudevent(
+                                        params,
+                                        params.GIVEX_GIFTCARD_CREATE_PROVIDER_ID,
+                                        params.GIVEX_GIFTCARD_CREATE_EVENTCODE,
+                                        giftcardPayload
+                                    );
+                                    giftcardpurchasedata['status'] = true;
+                                    giftcardpurchasedata['response'] = gitcardResponse;
+                                } catch (error) {
+                                    if (error.code == "ECONNABORTED") {
+                                        timeouterror = true
+                                    }
+                                    giftcardpurchasedata['status'] = false
+                                    giftcardpurchasedata['response'] = error
+                                }
+                            } else if (typeof paramsRequest.create_gift_card_sendcloudevent != "undefined" && paramsRequest.create_gift_card_sendcloudevent.status == true) {
+                                gitcardResponse = paramsRequest.create_gift_card_sendcloudevent.response;
+                                giftcardpurchasedata = paramsRequest.create_gift_card_sendcloudevent;
+            
+                            }
+                            responseData['create_gift_card_sendcloudevent'] = giftcardpurchasedata;
                         }
                     }
 
                     // If Purchase new loyalty card this execute this event
                     if(isLoyaltyPurchaseAvailable == true){
-                        var loyaltypayload = {"order_id": paramsRequest.order.entity_id , "futura_id": paramsRequest.futura_customer_id }
-                        var loyaltypurchase = await sendcloudevent(params,params.GIVEX_PROVIDER_ID,params.GIVEX_PURCHASE_LOYALTYMEMBER_CODE,{"value": loyaltypayload})
+                        var loyaltypurchasedata = {};
+                        var loyaltypurchase, loyaltypayload;
+                        //Retrying condition -8
+                        if (typeof paramsRequest.puchase_new_loyalty_card_sendcloudevent == "undefined" || paramsRequest.puchase_new_loyalty_card_sendcloudevent.status == false) {
+                            try {
+                                loyaltypurchasedata['integration'] = "Givex";
+                                loyaltypurchasedata['action'] = "Create Loyalty Card";
+                                loyaltypayload = {"order_id": paramsRequest.order.entity_id , "futura_id": paramsRequest.futura_customer_id };
+                                loyaltypurchasedata['request'] = loyaltypayload;
+                                loyaltypurchase = await sendcloudevent(params,params.GIVEX_PROVIDER_ID,params.GIVEX_PURCHASE_LOYALTYMEMBER_CODE,{"value": loyaltypayload});
+                                loyaltypurchasedata['status'] = true;
+                                loyaltypurchasedata['response'] = loyaltypurchase;
+                            } catch (error) {
+                                if (error.code == "ECONNABORTED") {
+                                    timeouterror = true
+                                }
+                                loyaltypurchasedata['status'] = false
+                                loyaltypurchasedata['response'] = error
+                            }
+                        } else if (typeof paramsRequest.puchase_new_loyalty_card_sendcloudevent != "undefined" && paramsRequest.puchase_new_loyalty_card_sendcloudevent.status == true) {
+                            loyaltypurchase = paramsRequest.puchase_new_loyalty_card_sendcloudevent.response;
+                            loyaltypurchasedata = paramsRequest.puchase_new_loyalty_card_sendcloudevent;
+                        }
+                        responseData['puchase_new_loyalty_card_sendcloudevent'] = loyaltypurchasedata;
                     }
 
                     // If renew Loyalty card then execute this event
                     if(isLoyaltyRenewAvailable == true){
-                        
-                        var renewloyaltypayload = {"order_id": paramsRequest.order.entity_id , "futura_id": paramsRequest.futura_customer_id }
-                        var loyaltypurchase = await sendcloudevent(params,params.GIVEX_PROVIDER_ID,params.GIVEX_RENEW_LOYALTYMEMBER_CODE,{"value": renewloyaltypayload})
+                        var renewloyaltydata = {};
+                        var renewloyaltypayload, renewLoyaltyPurchase;
+                        //Retrying condition -9
+                        if (typeof paramsRequest.renew_loyalty_card_sedncloudevent == "undefined" || paramsRequest.renew_loyalty_card_sedncloudevent.status == false) {
+                            try {
+                                renewloyaltydata['integration'] = "Givex"
+                                renewloyaltydata['action'] = "Renew Loyalty Card"
+                                renewloyaltypayload = {"order_id": paramsRequest.order.entity_id , "futura_id": paramsRequest.futura_customer_id };
+                                renewloyaltydata['request'] = renewloyaltypayload;
+                                renewLoyaltyPurchase = await sendcloudevent(params,params.GIVEX_PROVIDER_ID,params.GIVEX_RENEW_LOYALTYMEMBER_CODE,{"value": renewloyaltypayload});
+                                renewloyaltydata['status'] = true
+                                renewloyaltydata['response'] = renewLoyaltyPurchase
+                            } catch (error) {
+                                if (error.code == "ECONNABORTED") {
+                                    timeouterror = true
+                                }
+                                renewloyaltydata['status'] = false
+                                renewloyaltydata['response'] = error
+                            }
+                        } else if (typeof paramsRequest.renew_loyalty_card_sedncloudevent != "undefined" && paramsRequest.renew_loyalty_card_sedncloudevent.status == true) {
+                            renewLoyaltyPurchase = paramsRequest.renew_loyalty_card_sedncloudevent.response;
+                            renewloyaltydata = paramsRequest.renew_loyalty_card_sedncloudevent;
+                        }
+                        responseData['renew_loyalty_card_sedncloudevent'] = renewloyaltydata;
                     }
                 }
-
-
                 /** -- Futura order check | Ends  -- */
             }
         } catch (error) {
-            if (typeof responseData['']['status'] == "undefined") {
-                responseData['']['status'] = false;
+            if (typeof responseData['get_auth_token_viare']['status'] == "undefined") {
+                responseData['get_auth_token_viare']['status'] = false;
             }
-            if (id && typeof responseData['']['status'] == "undefined") {
-                responseData['']['status'] = false;
+            if (id && typeof responseData['order_exist_viare']['status'] == "undefined") {
+                responseData['order_exist_viare']['status'] = false;
             }
-            if (id && typeof responseData['']['status'] == "undefined") {
-                responseData['']['status'] = false;
+            if (id && typeof responseData['create_order_viare']['status'] == "undefined") {
+                responseData['create_order_viare']['status'] = false;
             }
-            if (id && typeof responseData['']['status'] == "undefined") {
-                responseData['']['status'] = false;
+            if (id && typeof responseData['is_order_exist_futura']['status'] == "undefined") {
+                responseData['is_order_exist_futura']['status'] = false;
             }
-            if (id && typeof responseData['']['status'] == "undefined") {
-                responseData['']['status'] = false;
+            if (id && typeof responseData['create_order_futura']['status'] == "undefined") {
+                responseData['create_order_futura']['status'] = false;
+            }
+            if (id && typeof responseData['create_order_givex_sendcloudevent']['status'] == "undefined") {
+                responseData['create_order_givex_sendcloudevent']['status'] = false;
+            }
+            if (id && typeof responseData['create_gift_card_sendcloudevent']['status'] == "undefined") {
+                responseData['create_gift_card_sendcloudevent']['status'] = false;
+            }
+            if (id && typeof responseData['puchase_new_loyalty_card_sendcloudevent']['status'] == "undefined") {
+                responseData['puchase_new_loyalty_card_sendcloudevent']['status'] = false;
+            }
+            if (id && typeof responseData['renew_loyalty_card_sedncloudevent']['status'] == "undefined") {
+                responseData['renew_loyalty_card_sedncloudevent']['status'] = false;
             }
         }
 
@@ -491,12 +589,12 @@ async function main(params) {
 
             const response = {
                 statusCode: 200,
-                body: final_response
+                body: responseData
             }
 
             // log the response status code
             logger.info(`${response.statusCode}: successful request`)
-            return response
+            return response;
     } catch (error) {
         // log any server errors
         // return with 500
