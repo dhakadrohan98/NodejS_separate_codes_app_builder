@@ -58,8 +58,10 @@ async function main (params) {
         'trace':1,
         'exceptions': true,
         'connection_timeout': 15
-      }
-      const apiEndpoint = params.VIARE_PRODUCT_API
+      } 
+      const apiEndpoint = params.VIARE_PRODUCT_API;
+      var published;
+
       // 'info' is the default level if not set
       logger.info('Calling the main action')
 
@@ -67,7 +69,6 @@ async function main (params) {
       logger.debug(stringParameters(params))
 
       try {
-
           // check for missing request input parameters and headers
           const requiredParams = [/* add required params */]
           const requiredHeaders = []
@@ -109,7 +110,6 @@ async function main (params) {
             productmagentodata = paramsRequest.get_product_data;
         }
         responseData['get_product_data'] = productmagentodata;
-        //start from here@23:41 (16 Oct)
 
           for (var i = 0; i < productdata.custom_attributes.length; i++) {
               if(productdata.custom_attributes[i].attribute_code == "erp_barcode" ||
@@ -123,49 +123,127 @@ async function main (params) {
 
 
               if(productdata.custom_attributes[i].attribute_code == "color"){
-
                     var attr_code = productdata.custom_attributes[i].attribute_code;
-
-                    // get Magento product attribute option Label from option Id
-                    productdata[attr_code] = await getProductOptions(params,attr_code,productdata.custom_attributes[i].value);
+                    var getproducttoptiondata = {};
+                    getproducttoptiondata['request'] = {};
+                    //Retrying condition -2
+                    if (typeof paramsRequest.get_product_option_magento == "undefined" || paramsRequest.get_product_option_magento.status == false){
+                    try {
+                      getproducttoptiondata['integration'] = "Magento";
+                      getproducttoptiondata['action'] = "Get Product Option";
+                      getproducttoptiondata['request']['attr_code'] = attr_code;
+                      getproducttoptiondata['request']['color'] = productdata.custom_attributes[i].value;
+                      // get Magento product attribute option Label from option Id
+                      productdata[attr_code] = await getProductOptions(params,attr_code,productdata.custom_attributes[i].value);
+                      getproducttoptiondata['status'] = true;
+                      getproducttoptiondata['response'] = productdata[attr_code];
+                    } catch (error) {
+                      if (error.code == "ECONNABORTED") {
+                          timeouterror = true
+                      }
+                      getproducttoptiondata['status'] = false;
+                      getproducttoptiondata['response'] = error;
+                  }
+                } else if (paramsRequest.get_product_option_magento != undefined && paramsRequest.get_product_option_magento.status == true) {
+                    productdata[attr_code] = paramsRequest.get_product_option_magento.response;
+                    getproducttoptiondata = paramsRequest.get_product_option_magento;
+                  }
+                  responseData['get_product_option_magento'] = getproducttoptiondata;
               }
           }
 
-          // if(productdata.type_id == "simple"){
+          if(productdata.type_id == "simple"){
 
-          // Update Viare product
-          responseData['viare'] = await SendProductRequest(authtoken, params, productdata, apiEndpoint, header);
+              // Update Viare product
+              var sendproductrequestdata={}, sendProductRequestResult={};
+              sendproductrequestdata['request'] = {};
+              //Retrying condition -3
+              if (typeof paramsRequest.send_product_request_viare == "undefined" || paramsRequest.send_product_request_viare.status == false) {
+                try {
+                  sendproductrequestdata['integration'] = "Viare";
+                  sendproductrequestdata['action'] = "Send Product Request";
+                  sendproductrequestdata['request']['authtoken'] = authtoken;
+                  sendproductrequestdata['request']['productdata'] = productdata;
+                  sendproductrequestdata['request']['apiEndpoint'] = apiEndpoint;
+                  sendproductrequestdata['request']['header'] = header;
+                  sendProductRequestResult = await SendProductRequest(authtoken, params, productdata, apiEndpoint, header);
+                  sendproductrequestdata['status'] = true;
+                  sendproductrequestdata['response'] = sendProductRequestResult;
+                } catch (error) {
+                  if (error.code == "ECONNABORTED") {
+                      timeouterror = true
+                  }
+                  sendproductrequestdata['status'] = false
+                  sendproductrequestdata['response'] = error
+              }
+            } else if (typeof paramsRequest.send_product_request_viare != "undefined" && paramsRequest.send_product_request_viare.status == true) {
+              sendProductRequestResult = paramsRequest.send_product_request_viare.response;
+              sendproductrequestdata = paramsRequest.send_product_request_viare;
+            }
+            responseData['send_product_request_viare'] = sendproductrequestdata;
 
-          // Update Viare Media
-          responseData['viare_media'] = await SendMediaImage(authtoken, params, productdata, apiEndpoint, header);
-      } catch (error) {
-        if (typeof responseData['']['status'] == "undefined") {
-            responseData['']['status'] = false;
+            var sendMediaImageResult = {};
+            var sendmediaimagedata = {};
+            //Retrying condition -4
+            if (typeof paramsRequest.send_media_image_viare == "undefined" || paramsRequest.send_media_image_viare.status == false) {
+              try{
+                sendmediaimagedata['integration'] = "Viare";
+                sendmediaimagedata['action'] = "Send Media Image";
+                if(responseData['send_product_request_viare'] != undefined && responseData['send_product_request_viare']['request'] != undefined) {
+                  sendmediaimagedata['request'] = responseData['send_product_request_viare']['request'];
+                }
+                // Update Viare Media
+                sendMediaImageResult = await SendMediaImage(authtoken, params, productdata, apiEndpoint, header);
+                sendmediaimagedata['status'] = true;
+                sendmediaimagedata['response'] = sendMediaImageResult;
+              } catch (error) {
+                if (error.code == "ECONNABORTED") {
+                    timeouterror = true
+                }
+                sendmediaimagedata['status'] = false
+                sendmediaimagedata['response'] = error
+            }
+          } else if (typeof paramsRequest.send_media_image_viare != "undefined" && paramsRequest.send_media_image_viare.status == true) {
+            sendMediaImageResult = paramsRequest.send_media_image_viare.response;
+            sendmediaimagedata = paramsRequest.send_media_image_viare;
+          }
+          responseData['send_media_image_viare'] = sendmediaimagedata;
+      } else {
+          //logging productdata.type_id into responseData (just for logging purpose if productdata.type_id is not simple)
+          responseData['product_type_not_simple'] = {};
+          responseData['product_type_not_simple']['integration'] = "Magento";
+          responseData['product_type_not_simple']['action'] = "Logging Product Data Type Id"
+          responseData['product_type_not_simple']['request'] = "";
+          responseData['product_type_not_simple']['status'] = true;
+          responseData['product_type_not_simple']['response'] = productdata.type_id;
+          // response = {
+          //     statusCode: 200,
+          //     body: productdata.type_id
+          // }
+        }		
+      } catch(error) {
+        if (typeof responseData['get_product_data']['status'] == "undefined") {
+          responseData['get_product_data']['status'] = false;
         }
-        if (id && typeof responseData['']['status'] == "undefined") {
-            responseData['']['status'] = false;
+        if (id && typeof responseData['get_product_option_magento']['status'] == "undefined") {
+            responseData['get_product_option_magento']['status'] = false;
         }
-    }
-        // Logging request
-        var published = await sendcloudevent(params,params.DUSK_MAGENTO_PROVIDER_ID, params.DUSK_LOGGING_EVENT_CODE, responseData)
-      
-
-        const response = {
-            statusCode: 200,
-            body: published
+        if (id && typeof responseData['send_product_request_viare']['status'] == "undefined") {
+          responseData['send_product_request_viare']['status'] = false;
         }
+        if (id && typeof responseData['send_media_image_viare']['status'] == "undefined") {
+          responseData['send_media_image_viare']['status'] = false;
+        }
+      } 
+      // Logging request
+      published = await sendcloudevent(params,params.DUSK_MAGENTO_PROVIDER_ID, params.DUSK_LOGGING_EVENT_CODE, responseData);
 
-      return response
-      // }else{
-      //   const newresponse = {
-      //       statusCode: 200,
-      //       body: productdata.type_id
-      //   }
-        
-      //   return newresponse
-      // }			
-    
-  } catch (error) {
+      const response = {
+          statusCode: 200,
+          body: responseData
+      }
+      return response;
+    } catch (error) {
     // log any server errors
     logger.error(error)
     // return with 500
